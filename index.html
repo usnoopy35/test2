@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>下班後的某宅羊 - 寶寶生長紀錄本</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        
+        /* --- CSS Variables for Theming --- */
+        :root {
+            --primary-color: #8D6E63;
+            --primary-hover: #6D4C41;
+            --secondary-bg: #FFF3E0;
+            --secondary-border: #FFE0B2;
+            --text-dark: #5D4037;
+            --bg-color: #fdfbf7;
+            --card-accent: #FFF8E1;
+        }
+
+        /* Boy Theme */
+        body.theme-boy {
+            --primary-color: #42A5F5;
+            --primary-hover: #1E88E5;
+            --secondary-bg: #E3F2FD;
+            --secondary-border: #BBDEFB;
+            --text-dark: #0D47A1;
+            --bg-color: #F1F8E9;
+            --card-accent: #E1F5FE;
+        }
+
+        /* Girl Theme */
+        body.theme-girl {
+            --primary-color: #EC407A;
+            --primary-hover: #D81B60;
+            --secondary-bg: #FCE4EC;
+            --secondary-border: #F8BBD0;
+            --text-dark: #880E4F;
+            --bg-color: #FFF5F7;
+            --card-accent: #FFF0F5;
+        }
+
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg-color); transition: background-color 0.5s; }
+        
+        .text-theme-dark { color: var(--text-dark); }
+        .text-theme-primary { color: var(--primary-color); }
+        .bg-theme-header { background-color: var(--secondary-bg); }
+        .bg-theme-accent { background-color: var(--card-accent); }
+        .border-theme { border-color: var(--secondary-border); }
+
+        .btn-primary { background-color: var(--primary-color); color: white; transition: 0.3s; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-secondary { background-color: var(--secondary-bg); color: var(--text-dark); border: 1px solid var(--secondary-border); transition: 0.3s; }
+        .btn-secondary:hover { filter: brightness(0.95); }
+        
+        .card { background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .chart-container { position: relative; height: 400px; width: 100%; }
+        
+        /* Tabs */
+        .tab-btn { border-bottom: 3px solid transparent; color: #888; padding-bottom: 0.5rem; transition: all 0.3s; }
+        .tab-btn.active { border-bottom: 3px solid var(--primary-color); color: var(--text-dark); font-weight: bold; }
+        
+        .modal { transition: opacity 0.25s ease; }
+        body.modal-active { overflow-x: hidden; overflow-y: visible !important; }
+
+        /* --- Improved Teeth Styling --- */
+        .dental-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            padding: 20px 0;
+            overflow-x: auto; /* Handle small screens */
+        }
+
+        .dental-arch {
+            position: relative;
+            width: 300px;
+            height: 160px;
+            flex-shrink: 0;
+        }
+
+        /* Upper Arch (Inverted U) */
+        .dental-arch.upper {
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+        }
+
+        .tooth-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center center;
+            width: 24px;
+            height: 40px;
+            transition: all 0.5s;
+        }
+        
+        .tooth-mark {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            margin: 1px;
+            transition: 0.3s;
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .tooth-mark.primary { width: 16px; height: 16px; border-radius: 6px; }
+        .tooth-mark.permanent { width: 20px; height: 20px; border-radius: 4px; }
+
+        /* States */
+        .tooth-mark.primary.erupted {
+            background-color: #fff;
+            border: 2px solid #81C784;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transform: scale(1.1);
+        }
+        
+        .tooth-mark.permanent.erupted {
+            background-color: #FFF9C4;
+            border: 2px solid #FBC02D;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .tooth-mark.shed {
+            background-color: transparent;
+            border: 1px dashed #ccc;
+            opacity: 0.3;
+        }
+
+        .arch-label {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #ccc;
+            font-weight: bold;
+            pointer-events: none;
+        }
+        .dental-arch.upper .arch-label { bottom: 10px; }
+        .dental-arch.lower .arch-label { top: 10px; }
+
+        .item-tag {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 6px;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            display: inline-block;
+            font-weight: normal;
+        }
+        .item-tag.book { background-color: #e0f2fe; color: #0369a1; }
+        .item-tag.game { background-color: #fef3c7; color: #b45309; }
+
+    </style>
+</head>
+<body class="text-gray-700 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-theme-header p-4 shadow-sm sticky top-0 z-40 transition-colors duration-500">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showView('listView')">
+                <div class="w-10 h-10 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl transition-colors duration-300">
+                    🐑
+                </div>
+                <h1 class="text-xl font-bold text-theme-dark flex items-center gap-2">
+                    <a href="https://www.facebook.com/profile.php?id=61584059466555" target="_blank" class="hover:text-theme-primary transition-colors hover:underline">
+                        下班後的某宅羊
+                    </a>
+                    <span class="text-sm font-normal text-theme-primary hidden sm:inline">| 寶寶生長紀錄</span>
+                </h1>
+            </div>
+            <div id="headerActions"></div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 w-full flex-grow">
+
+        <!-- VIEW: Child List (Home) -->
+        <section id="listView" class="space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-4 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-theme-dark">寶貝列表</h2>
+                    <p class="text-sm text-gray-500">選擇一位小朋友查看生長紀錄</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="document.getElementById('importFile').click()" class="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg shadow-sm hover:bg-gray-200 text-sm flex items-center gap-1 border border-gray-200">
+                        <i class="fas fa-file-import"></i> 匯入資料
+                    </button>
+                    <input type="file" id="importFile" class="hidden" onchange="importData(this)" accept=".json">
+                    
+                    <button onclick="exportData()" class="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg shadow-sm hover:bg-gray-200 text-sm flex items-center gap-1 border border-gray-200">
+                        <i class="fas fa-file-export"></i> 備份資料
+                    </button>
+                    
+                    <button onclick="openModal('addChildModal')" class="btn-primary px-4 py-2 rounded-lg shadow-sm flex items-center gap-2">
+                        <i class="fas fa-plus"></i> 新增寶寶
+                    </button>
+                </div>
+            </div>
+
+            <div id="childrenContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Children cards will be injected here -->
+            </div>
+
+            <div id="emptyState" class="hidden text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                <div class="text-4xl mb-3">👶</div>
+                <p class="text-gray-500">還沒有建立寶寶資料喔！</p>
+                <button onclick="openModal('addChildModal')" class="mt-4 text-theme-primary font-bold hover:underline">馬上建立</button>
+            </div>
+        </section>
+
+        <!-- VIEW: Child Detail -->
+        <section id="detailView" class="hidden space-y-6">
+            <!-- Child Profile Header -->
+            <div class="card p-6 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h2 id="detailName" class="text-2xl font-bold text-theme-dark">--</h2>
+                            <span id="detailGender" class="px-2 py-1 rounded text-xs font-bold bg-gray-100 text-gray-600">--</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">
+                            生日：<span id="detailDob">--</span> 
+                            (目前 <span id="detailAge">--</span>)
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="deleteCurrentChild()" class="text-red-400 hover:text-red-600 px-3 py-2 text-sm border border-red-200 rounded-lg bg-white relative z-10">
+                            <i class="fas fa-trash"></i> 刪除
+                        </button>
+                        <button onclick="showView('listView')" class="btn-secondary px-4 py-2 rounded-lg text-sm relative z-10">
+                            <i class="fas fa-arrow-left"></i> 返回列表
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor's Advice Card -->
+            <div id="adviceCard" class="card p-4 bg-gradient-to-r from-white to-gray-50 border-l-4 border-theme flex gap-4 animate-fade-in shadow-sm">
+                <div class="text-3xl flex items-start pt-1">👨🏻‍⚕️</div>
+                <div>
+                    <h3 class="font-bold text-theme-dark text-sm md:text-base mb-1">來自醫師的小叮嚀：<span id="adviceTitle" class="text-theme-primary">--</span></h3>
+                    <p id="adviceText" class="text-sm text-gray-600 leading-relaxed text-justify">--</p>
+                </div>
+            </div>
+
+            <!-- Action Bar (Grid Layout: 2 Rows) -->
+            <div class="grid grid-cols-4 gap-2 mb-4 bg-white p-2 rounded-xl shadow-sm border border-gray-100">
+                <button onclick="switchDetailTab('record')" id="tab-record" class="tab-btn active flex flex-col items-center justify-center py-2 text-sm rounded hover:bg-gray-50">
+                    <i class="fas fa-plus-circle text-lg mb-1"></i> 紀錄
+                </button>
+                <button onclick="switchDetailTab('chart')" id="tab-chart" class="tab-btn flex flex-col items-center justify-center py-2 text-sm rounded hover:bg-gray-50">
+                    <i class="fas fa-chart-line text-lg mb-1"></i> 曲線
+                </button>
+                <button onclick="switchDetailTab('history')" id="tab-history" class="tab-btn flex flex-col items-center justify-center py-2 text-sm rounded hover:bg-gray-50">
+                    <i class="fas fa-list text-lg mb-1"></i> 列表
+                </button>
+                <button onclick="switchDetailTab('development')" id="tab-development" class="tab-btn flex flex-col items-center justify-center py-2 text-sm rounded hover:bg-gray-50">
+                    <i class="fas fa-baby-carriage text-lg mb-1"></i> 發展
+                </button>
+                <button onclick="switchDetailTab('vaccine')" id="tab-vaccine" class="tab-btn flex flex-col items-center justify-center py-2 text-sm rounded hover:bg-gray-50">
+                    <i class="fas fa-syringe text-lg mb-1"></i> 疫苗
+                </button>
+                <button onclick="switchDetailTab('teeth')" id="tab-teeth" class="tab-btn flex flex-col items-center justify-center py-2 text-sm rounded hover:bg-gray-50">
+                    <i class="fas fa-tooth text-lg mb-1"></i> 牙齒
+                </button>
+                <button onclick="switchDetailTab('recommend')" id="tab-recommend" class="tab-btn flex flex-col items-center justify-center py-2 text-sm rounded hover:bg-gray-50">
+                    <i class="fas fa-gift text-lg mb-1"></i> 推薦
+                </button>
+                <button onclick="switchDetailTab('predict')" id="tab-predict" class="tab-btn flex flex-col items-center justify-center py-2 text-sm rounded hover:bg-gray-50">
+                    <i class="fas fa-ruler-vertical text-lg mb-1"></i> 預測
+                </button>
+            </div>
+
+            <!-- TAB: New Record -->
+            <div id="content-record" class="tab-content card p-6">
+                <h3 class="font-bold text-theme-dark mb-4">📝 輸入新的測量數據</h3>
+                <form id="recordForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">測量日期</label>
+                        <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden flex-1 bg-white h-10">
+                            <span class="bg-gray-50 px-2 text-xs text-gray-500 h-full flex items-center border-r border-gray-200 min-w-[3rem] justify-center font-bold text-theme-primary">年</span>
+                            <input type="number" id="recYear" class="w-full h-full px-1 outline-none text-center text-theme-dark" placeholder="113或2024">
+                            <span class="text-gray-300">/</span>
+                            <input type="number" id="recMonth" class="w-full h-full px-1 outline-none text-center text-theme-dark" placeholder="月">
+                            <span class="text-gray-300">/</span>
+                            <input type="number" id="recDay" class="w-full h-full px-1 outline-none text-center text-theme-dark" placeholder="日">
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">* 系統自動辨識民國(3碼)或西元(4碼)年份</p>
+                    </div>
+                    <div class="hidden md:block"></div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">身高 (cm)</label>
+                        <input type="number" step="0.1" id="recHeight" placeholder="例如: 95.5" class="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-current text-theme-primary outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">體重 (kg)</label>
+                        <input type="number" step="0.1" id="recWeight" placeholder="例如: 14.2" class="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-current text-theme-primary outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">頭圍 (cm) <span class="text-xs text-gray-400">(選填)</span></label>
+                        <input type="number" step="0.1" id="recHead" placeholder="例如: 48.0" class="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-current text-theme-primary outline-none">
+                    </div>
+                    <div class="md:col-span-2 pt-2">
+                        <button type="button" onclick="addRecord()" class="w-full btn-primary py-3 rounded-lg font-bold shadow-md transform active:scale-95">
+                            儲存並分析
+                        </button>
+                    </div>
+                </form>
+                <div id="instantResult" class="hidden mt-6 p-4 bg-theme-accent rounded-lg border border-theme animate-fade-in">
+                    <h4 class="font-bold text-theme-dark mb-2 text-center">本次評估結果</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div class="bg-white p-2 rounded shadow-sm"><p class="text-xs text-gray-500">身高</p><p class="font-bold text-blue-600 text-lg" id="resHeight">--</p></div>
+                        <div class="bg-white p-2 rounded shadow-sm"><p class="text-xs text-gray-500">體重</p><p class="font-bold text-green-600 text-lg" id="resWeight">--</p></div>
+                        <div class="bg-white p-2 rounded shadow-sm"><p class="text-xs text-gray-500">頭圍</p><p class="font-bold text-purple-600 text-lg" id="resHead">--</p></div>
+                        <div class="bg-white p-2 rounded shadow-sm border border-blue-100"><p class="text-xs text-gray-500"><i class="fas fa-tint text-blue-400"></i> 建議每日水分攝取</p><p class="font-bold text-blue-500 text-lg" id="resWater">--</p></div>
+                    </div>
+                    <p class="text-xs text-center text-gray-400 mt-3">喝水量計算採用 Holiday-Segar 公式，包含奶量與湯品。</p>
+                </div>
+            </div>
+
+            <!-- TAB: Chart -->
+            <div id="content-chart" class="tab-content hidden card p-4">
+                 <div class="flex border-b border-gray-200 mb-4 overflow-x-auto">
+                    <button class="chart-tab-btn active px-4 py-2 whitespace-nowrap text-sm font-bold text-theme-primary border-b-2 border-theme" onclick="switchChartType('height', this)">身高曲線</button>
+                    <button class="chart-tab-btn px-4 py-2 whitespace-nowrap text-sm text-gray-500" onclick="switchChartType('weight', this)">體重曲線</button>
+                    <button class="chart-tab-btn px-4 py-2 whitespace-nowrap text-sm text-gray-500" onclick="switchChartType('head', this)">頭圍曲線</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="growthChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-gray-400 mt-2">* 支援多點觸控縮放，點擊數據點可看詳細日期</p>
+            </div>
+
+            <!-- TAB: History -->
+            <div id="content-history" class="tab-content hidden card overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-50 text-gray-600">
+                            <tr>
+                                <th class="p-4 whitespace-nowrap">日期</th>
+                                <th class="p-4 whitespace-nowrap">年齡</th>
+                                <th class="p-4">身高</th>
+                                <th class="p-4">體重</th>
+                                <th class="p-4">頭圍</th>
+                                <th class="p-4 text-blue-500 whitespace-nowrap">建議每日水分攝取</th>
+                                <th class="p-4 text-right">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: Development -->
+            <div id="content-development" class="tab-content hidden card p-6">
+                <div class="flex justify-between items-center mb-4 border-b border-theme pb-2">
+                    <h3 class="font-bold text-theme-dark text-xl"><i class="fas fa-baby-carriage mr-2 text-theme-primary"></i> 兒童發展評估</h3>
+                    <span id="devAgeStage" class="text-sm bg-theme-accent px-2 py-1 rounded text-theme-dark font-bold">--</span>
+                </div>
+                <div id="devListContainer" class="space-y-4"></div>
+                <div class="mt-6 p-3 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-100">
+                    <i class="fas fa-exclamation-triangle mr-1"></i> 注意：若有超過一半的項目未達標，建議諮詢小兒神經科或復健科醫師。
+                </div>
+            </div>
+
+            <!-- TAB: Vaccine -->
+            <div id="content-vaccine" class="tab-content hidden card p-6">
+                <div class="flex justify-between items-center mb-4 border-b border-theme pb-2">
+                    <h3 class="font-bold text-theme-dark text-xl"><i class="fas fa-syringe mr-2 text-theme-primary"></i> 疫苗接種時程</h3>
+                </div>
+                <div class="flex gap-2 mb-4 text-xs justify-center">
+                    <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center text-white text-[10px]"><i class="fas fa-check"></i></span> 應已施打</span>
+                    <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-yellow-400 flex items-center justify-center text-white text-[10px]"><i class="fas fa-clock"></i></span> 近期留意</span>
+                    <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-blue-400 flex items-center justify-center text-white text-[10px]"><i class="fas fa-calendar-alt"></i></span> 未來行程</span>
+                </div>
+                <div id="vaccineListContainer" class="space-y-3"></div>
+                <p class="text-xs text-center text-gray-400 mt-4">* 時程參考台灣 CDC 常規疫苗，實際接種請遵循醫師評估。</p>
+            </div>
+
+             <!-- TAB: Teeth -->
+             <div id="content-teeth" class="tab-content hidden card p-6">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h3 class="font-bold text-theme-dark">🦷 牙齒生長進度</h3>
+                    <div class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">目前年齡: <span id="teethAgeDisplay">--</span></div>
+                </div>
+                <div class="flex flex-wrap justify-center gap-3 mb-6 text-xs bg-gray-50 p-3 rounded-lg">
+                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-white border border-green-400"></span> 乳牙</div>
+                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-100 border border-yellow-400"></span> 恆牙</div>
+                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded border border-dashed border-gray-300 opacity-50"></span> 未長</div>
+                </div>
+                <div class="dental-chart bg-theme-accent rounded-xl border border-theme">
+                    <div class="dental-arch upper" id="jawUpper"><div class="arch-label">上排牙齒 (Upper)</div></div>
+                    <div class="dental-arch lower" id="jawLower"><div class="arch-label">下排牙齒 (Lower)</div></div>
+                </div>
+                <div class="mt-6 space-y-3 p-4 rounded-lg bg-white border border-gray-100">
+                    <h4 class="font-bold text-sm text-theme-dark border-b border-theme pb-1">發育階段說明</h4>
+                    <p id="teethStageText" class="text-sm text-gray-600 leading-relaxed">--</p>
+                </div>
+            </div>
+
+            <!-- TAB: Recommendations -->
+            <div id="content-recommend" class="tab-content hidden card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-theme-dark text-xl"><i class="fas fa-gift mr-2 text-theme-primary"></i> 專屬好物推薦</h3>
+                    <button onclick="refreshRecommendations()" class="text-sm bg-gray-100 px-3 py-1 rounded-full text-gray-600 hover:bg-gray-200 transition"><i class="fas fa-sync-alt mr-1"></i> 換一組</button>
+                </div>
+                <div class="mb-8">
+                    <h4 class="font-bold text-gray-600 mb-3 border-l-4 border-theme pl-2">📚 適合的圖書 (5本)</h4>
+                    <div id="bookList" class="space-y-3"></div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-600 mb-3 border-l-4 border-theme pl-2">🎲 適合的桌遊/玩具 (1款)</h4>
+                    <div id="gameList"></div>
+                </div>
+                <p class="text-xs text-gray-400 mt-6 text-center">推薦清單由系統根據年齡隨機挑選，僅供參考。</p>
+            </div>
+
+            <!-- TAB: Prediction -->
+            <div id="content-predict" class="tab-content hidden card p-6">
+                <div class="flex justify-between items-center mb-6 border-b border-theme pb-2">
+                    <h3 class="font-bold text-theme-dark text-xl"><i class="fas fa-ruler-vertical mr-2 text-theme-primary"></i> 成年身高預測</h3>
+                </div>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600 mb-1">爸爸身高 (cm)</label>
+                            <input type="number" id="predDad" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-current text-theme-primary" placeholder="175">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600 mb-1">媽媽身高 (cm)</label>
+                            <input type="number" id="predMom" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-current text-theme-primary" placeholder="160">
+                        </div>
+                    </div>
+                    <button onclick="calculatePrediction()" class="w-full btn-primary py-3 rounded-lg font-bold shadow-md">開始預測</button>
+                </div>
+                <div id="predResult" class="hidden mt-6 bg-theme-accent p-6 rounded-xl text-center animate-fade-in border border-theme">
+                    <p class="text-sm text-gray-500 mb-2">預估目標身高 (Target Height)</p>
+                    <div class="text-4xl font-bold text-theme-primary mb-2"><span id="predValue">--</span> <span class="text-lg">cm</span></div>
+                    <div class="text-sm text-gray-600">遺傳範圍： <span id="predRange" class="font-bold">--</span></div>
+                    <p class="text-xs text-gray-400 mt-4">* 此公式基於父母身高遺傳計算，實際身高受營養、睡眠、運動等多重因素影響。</p>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Modals -->
+    <div id="addChildModal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
+        <div class="modal-overlay absolute w-full h-full bg-black opacity-50"></div>
+        <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-lg shadow-lg z-50 overflow-y-auto transform transition-all scale-95 opacity-0">
+            <div class="modal-content py-4 text-left px-6">
+                <div class="flex justify-between items-center pb-3 border-b mb-3">
+                    <p class="text-2xl font-bold text-theme-dark">新增一位寶貝</p>
+                    <div class="modal-close cursor-pointer z-50" onclick="closeModal('addChildModal')"><i class="fas fa-times"></i></div>
+                </div>
+                <form id="addChildForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-1">寶貝暱稱</label>
+                        <input type="text" id="newChildName" placeholder="例如: 小湯圓" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-current text-theme-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">性別</label>
+                        <div class="flex gap-4 mt-1">
+                            <label class="flex items-center cursor-pointer p-2 border rounded-lg flex-1 justify-center hover:bg-blue-50 transition"><input type="radio" name="newChildGender" value="boy" checked class="w-4 h-4 text-blue-500"><span class="ml-2 font-bold text-blue-600">👦 男寶</span></label>
+                            <label class="flex items-center cursor-pointer p-2 border rounded-lg flex-1 justify-center hover:bg-pink-50 transition"><input type="radio" name="newChildGender" value="girl" class="w-4 h-4 text-pink-500"><span class="ml-2 font-bold text-pink-600">👧 女寶</span></label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">出生日期</label>
+                        <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden flex-1 bg-white h-10">
+                            <span class="bg-gray-50 px-2 text-xs text-gray-500 h-full flex items-center border-r border-gray-200 min-w-[3rem] justify-center" id="newChildYearLabel">民國</span>
+                            <input type="number" id="newChildYear" class="w-full h-full px-1 outline-none text-center text-theme-dark" placeholder="113或2024">
+                            <span class="text-gray-300">/</span>
+                            <input type="number" id="newChildMonth" class="w-full h-full px-1 outline-none text-center text-theme-dark" placeholder="月">
+                            <span class="text-gray-300">/</span>
+                            <input type="number" id="newChildDay" class="w-full h-full px-1 outline-none text-center text-theme-dark" placeholder="日">
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">* 系統自動辨識民國(3碼)或西元(4碼)年份</p>
+                    </div>
+                </form>
+                <div class="flex justify-end pt-4 mt-4 border-t space-x-2">
+                    <button onclick="closeModal('addChildModal')" class="px-4 py-2 bg-gray-200 rounded-lg text-gray-600 hover:bg-gray-300">取消</button>
+                    <button onclick="saveNewChild()" class="px-4 py-2 btn-primary rounded-lg">建立檔案</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="alertModal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
+        <div class="modal-overlay absolute w-full h-full bg-black opacity-50"></div>
+        <div class="modal-container bg-white w-10/12 md:max-w-sm mx-auto rounded-lg shadow-lg z-50 overflow-y-auto transform transition-all scale-95 opacity-0">
+            <div class="modal-content py-4 text-center px-6">
+                <div class="text-4xl mb-2">💡</div>
+                <h3 class="text-xl font-bold text-theme-dark mb-2" id="alertTitle">提示</h3>
+                <p class="text-gray-600 mb-6" id="alertMessage"></p>
+                <button onclick="closeModal('alertModal')" class="w-full px-4 py-2 btn-primary rounded-lg">我知道了</button>
+            </div>
+        </div>
+    </div>
+    <div id="confirmModal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
+        <div class="modal-overlay absolute w-full h-full bg-black opacity-50"></div>
+        <div class="modal-container bg-white w-10/12 md:max-w-sm mx-auto rounded-lg shadow-lg z-50 overflow-y-auto transform transition-all scale-95 opacity-0">
+            <div class="modal-content py-4 text-center px-6">
+                <div class="text-4xl mb-2 text-red-400">⚠️</div>
+                <h3 class="text-xl font-bold text-theme-dark mb-2" id="confirmTitle">確認</h3>
+                <p class="text-gray-600 mb-6" id="confirmMessage"></p>
+                <div class="flex gap-2">
+                    <button onclick="closeModal('confirmModal')" class="flex-1 px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300">取消</button>
+                    <button id="confirmYesBtn" class="flex-1 px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-500">確定刪除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ... (CONSTANTS same as before) ...
+        const DATA_SOURCES = {
+            boy: {
+                height: [[0,1,49.884,0.03795],[6,1,67.62,0.03265],[12,1,75.75,0.03215],[24,1,87.8,0.0323],[36,1,96.1,0.0329],[48,1,103.3,0.0336],[60,1,110.0,0.0343],[84,1,122.5,0.045],[120,1,140.5,0.05],[144,1,155.0,0.055],[168,1,168.0,0.045],[216,1,172.5,0.04]],
+                weight: [[0,0.3487,3.346,0.146],[6,0.0768,7.9,0.11],[12,0.015,9.6,0.108],[24,-0.05,12.2,0.11],[36,-0.09,14.3,0.115],[48,-0.11,16.3,0.12],[60,-0.12,18.3,0.125],[84,-0.15,23.5,0.14],[120,-0.2,35.0,0.16],[144,-0.2,48.0,0.18],[168,-0.1,60.0,0.15],[216,-0.05,65.0,0.14]],
+                head: [[0,1,34.5,0.037],[6,1,43.3,0.03],[12,1,46.1,0.028],[24,1,48.2,0.027],[36,1,49.5,0.027],[48,1,50.2,0.027],[60,1,50.7,0.027]]
+            },
+            girl: {
+                height: [[0,1,49.1,0.0379],[6,1,65.7,0.033],[12,1,74.0,0.033],[24,1,86.4,0.033],[36,1,95.1,0.034],[48,1,102.7,0.035],[60,1,109.4,0.036],[84,1,121.0,0.045],[120,1,141.0,0.05],[144,1,153.0,0.05],[168,1,159.0,0.045],[216,1,160.0,0.04]],
+                weight: [[0,0.38,3.2,0.14],[6,0.07,7.3,0.11],[12,0.02,8.9,0.11],[24,-0.06,11.5,0.12],[36,-0.1,13.9,0.13],[48,-0.13,16.1,0.135],[60,-0.15,18.2,0.14],[84,-0.18,23.0,0.15],[120,-0.2,34.0,0.18],[144,-0.15,46.0,0.18],[168,-0.1,53.0,0.16],[216,-0.05,55.0,0.15]],
+                head: [[0,1,33.9,0.035],[6,1,42.2,0.03],[12,1,44.9,0.028],[24,1,47.2,0.027],[36,1,48.5,0.027],[48,1,49.3,0.027],[60,1,49.7,0.027]]
+            }
+        };
+
+        const ADVICE_DATA = [
+            { min: 0, max: 0.25, list: ["新生兒睡眠時間長，注意睡姿安全，避免趴睡。", "溢奶是正常的生理現象，喝奶後記得拍嗝，但不強求。", "視力發展初期，黑白圖卡是不錯的刺激工具。"], title: "0-3個月 新生兒適應期" },
+            { min: 0.25, max: 0.5, list: ["寶寶開始嘗試翻身囉！注意床邊護欄，避免跌落。", "脖子變硬挺了，可以趴著抬頭看看世界。", "口水變多，喜歡吃手，這是口腔期的探索表現。"], title: "4-6個月 脖頸硬挺期" },
+            { min: 0.5, max: 1, list: ["七坐八爬，家中危險物品要收好，插座加上防護蓋。", "開始長牙可能會歡必霸，給予固齒器舒緩不適。", "副食品多樣化嘗試，建立免疫耐受性，不需延後給予高致敏食物。"], title: "7-12個月 坐爬探索期" },
+            { min: 1, max: 1.5, list: ["學步期搖搖晃晃，居家防撞措施不能少。", "開始模仿大人說話，多跟寶寶聊天念繪本，並讓寶寶看大人發音時的口型。", "每半年記得帶寶寶去塗氟，保護乳牙健康。"], title: "1-1.5歲 學步期" },
+            { min: 1.5, max: 3, list: ["處於『不要不要』的叛逆期，試著給予選擇題代替是非題。", "精力旺盛，多帶去公園放電，有助於晚上睡眠。", "可開始嘗試白天的如廁訓練，但不要給予太大壓力。"], title: "1.5-3歲 幼兒叛逆期" },
+            { min: 3, max: 5, list: ["進入幼兒園，初期容易感冒，這是建立免疫系統的過程。", "想像力豐富，喜歡扮演遊戲，陪孩子演戲是很好的互動。", "精細動作進步中，可以玩積木、畫畫訓練小手肌肉。"], title: "3-5歲 學齡前(幼兒園)" },
+            { min: 5, max: 7, list: ["準備進入小學，建立規律作息與早睡早起的習慣。", "開始換牙（第一大臼齒萌發），要幫孩子使用牙線清潔。", "注意視力保健，用眼30分鐘休息10分鐘，多戶外活動。"], title: "5-7歲 學齡前(大班-小一)" },
+            { min: 7, max: 10, list: ["生長平穩期，多做跳繩、打球等跳躍性運動刺激生長板。", "避免過多含糖飲料，糖分會抑制生長激素分泌。", "培養閱讀習慣，減少3C產品的使用時間。"], title: "7-10歲 國小中年級" },
+            { min: 10, max: 12, gender: 'girl', list: ["女孩青春期較早，胸部發育是第一徵兆，提醒孩子這是正常的。", "生長衝刺期開始，確保充足睡眠與鈣質攝取。", "多運動刺激生長，跳繩是不錯的選擇。"], title: "10-12歲 青春期初期(女)" },
+            { min: 10, max: 12, gender: 'boy', list: ["男孩發育較晚，此階段儲備能量，多做負重運動存骨本。", "若睪丸明顯變大，代表青春期悄悄開始囉。", "均衡飲食，避免肥胖影響性早熟。"], title: "10-12歲 儲備期(男)" },
+            { min: 12, max: 15, gender: 'girl', list: ["月經初潮通常發生在此階段，身高增加速度會減緩。", "注意鐵質攝取（如紅肉、深綠蔬菜）預防貧血。", "保持自信，接納身體的變化，心理健康很重要。"], title: "12-15歲 青春期成熟(女)" },
+            { min: 12, max: 15, gender: 'boy', list: ["變聲、喉結出現，身高進入飆速期，一年可長10公分以上！", "食量大增，需補充足夠蛋白質與鈣質，避免吃垃圾食物。", "運動量大，注意運動傷害防護。"], title: "12-15歲 青春期衝刺(男)" },
+            { min: 15, max: 18, gender: 'girl', list: ["生長板逐漸閉合，身高趨於定型，維持良好體態。", "規律運動不僅維持身材，也能釋放課業壓力。", "建立正確的身體意象，不盲目追求過瘦。"], title: "15-18歲 青少年(女)" },
+            { min: 15, max: 18, gender: 'boy', list: ["生長速度減緩，但肌肉量持續增加，體型變壯。", "部分男孩到高中畢業前仍有長高空間，作息要正常。", "培養一種喜愛的運動習慣，受用終身。"], title: "15-18歲 青少年(男)" }
+        ];
+
+        // Refined Books with Tags
+        const BOOKS_LIBRARY = [
+            { ageMin: 0, ageMax: 1, list: [
+                { title: "好餓的毛毛蟲", tags: ["經典","認知"] }, { title: "小金魚逃走了", tags: ["觀察","經典"] }, { title: "親愛的動物園", tags: ["翻翻書","認知"] }, 
+                { title: "抱抱", tags: ["情感","經典"] }, { title: "棕色的熊", tags: ["色彩","韻律"] }, { title: "月亮晚安", tags: ["睡眠儀式"] },
+                { title: "猜猜我有多愛你", tags: ["情感","經典"] }, { title: "小黃點", tags: ["互動","創意"] }, { title: "這是什麼系列", tags: ["認知"] }, 
+                { title: "帕可好愛爵士樂", tags: ["有聲","音樂"] }, { title: "晚安，猩猩", tags: ["幽默","觀察"] }, { title: "這是誰的屁股？", tags: ["認知","幽默"] },
+                { title: "小波在哪裡？", tags: ["翻翻書","經典"] }, { title: "摸一摸看一看", tags: ["觸覺"] }, { title: "小雞球球系列", tags: ["操作","生活"] },
+                { title: "躲貓貓 (Usborne)", tags: ["觸覺","操作"] }, { title: "艾摩的便盆", tags: ["生活自理"] }, { title: "好餓的小蛇", tags: ["幽默","色彩"] },
+                { title: "小寶寶翻翻書", tags: ["操作"] }, { title: "我爸爸/我媽媽", tags: ["情感"] }, { title: "親一親", tags: ["互動","情感"] },
+                { title: "蹦!", tags: ["律動"] }, { title: "好餓好餓的魚", tags: ["視覺"] }, { title: "丹丹寶寶版", tags: ["生活"] }
+            ]},
+            { ageMin: 1, ageMax: 3, list: [
+                { title: "小雞逛超市", tags: ["生活","細節"] }, { title: "鱷魚怕怕牙醫怕怕", tags: ["生活","幽默"] }, { title: "去買晚餐的路上", tags: ["觀察"] }, 
+                { title: "母雞蘿絲去散步", tags: ["幽默","經典"] }, { title: "小波在哪裡", tags: ["翻翻書"] }, { title: "包姆與凱羅系列", tags: ["細節","友情"] }, 
+                { title: "野獸國", tags: ["情緒","經典"] }, { title: "古利和古拉", tags: ["分享","美食"] }, { title: "點點玩聲音", tags: ["互動"] },
+                { title: "媽媽買綠豆", tags: ["親情","生活"] }, { title: "誰咬了我的大餅", tags: ["推理","動物"] }, { title: "巴士到站了", tags: ["交通"] },
+                { title: "這是公車", tags: ["韻律"] }, { title: "謝謝你來當我的寶貝", tags: ["情感"] }, { title: "雲上的阿里", tags: ["生命教育"] },
+                { title: "小熊學校", tags: ["校園","友情"] }, { title: "我的衣裳", tags: ["創意"] }, { title: "加油！警車", tags: ["交通"] },
+                { title: "工藤紀子小雞系列", tags: ["生活"] }, { title: "我是霸王龍", tags: ["友情","恐龍"] }, { title: "小企鵝搭火車", tags: ["冒險"] },
+                { title: "殼斗村的帽子店", tags: ["職業"] }, { title: "烏鴉麵包店", tags: ["家庭"] }, { title: "小蠶豆的床", tags: ["分享"] },
+                { title: "生氣的亞瑟", tags: ["情緒"] }, { title: "討厭黑夜的席奶奶", tags: ["恐懼"] }
+            ]},
+            { ageMin: 3, ageMax: 6, list: [
+                { title: "神奇樹屋系列", tags: ["冒險","科普"] }, { title: "100層樓的家", tags: ["觀察","數數"] }, { title: "生氣王子", tags: ["情緒","溝通"] },
+                { title: "愛哭公主", tags: ["情緒"] }, { title: "屁屁偵探繪本", tags: ["觀察","推理"] }, { title: "長襪皮皮", tags: ["冒險"] },
+                { title: "爺爺一定有辦法", tags: ["創意","惜物"] }, { title: "大衛，不可以", tags: ["規矩"] }, { title: "不睡覺世界冠軍", tags: ["想像"] },
+                { title: "這是我的！", tags: ["分享"] }, { title: "勇敢小火車", tags: ["勇氣"] }, { title: "朱瑞福的游泳課", tags: ["成長"] },
+                { title: "野貓軍團", tags: ["幽默","後果"] }, { title: "活了一百萬次的貓", tags: ["生命","愛"] }, { title: "蚯蚓的日記", tags: ["幽默"] },
+                { title: "蠟筆小黑", tags: ["合作","創意"] }, { title: "殼斗村的麵包店", tags: ["職業"] }, { title: "小房子", tags: ["環境"] },
+                { title: "賣帽子", tags: ["幽默"] }, { title: "古利和古拉", tags: ["合作"] }, { title: "森林100層樓的家", tags: ["觀察"] },
+                { title: "地下100層樓的家", tags: ["觀察"] }, { title: "海底100層樓的家", tags: ["觀察"] }, { title: "天空100層樓的家", tags: ["觀察"] },
+                { title: "到底在排什麼？", tags: ["觀察"] }, { title: "第一次上街買東西", tags: ["成長"] }, { title: "獾的禮物", tags: ["生命教育"] }
+            ]},
+            { ageMin: 6, ageMax: 10, list: [
+                { title: "神奇樹屋", tags: ["橋樑書","冒險"] }, { title: "怪傑佐羅力", tags: ["幽默","創意"] }, { title: "尋寶記系列", tags: ["知識","漫畫"] },
+                { title: "晴天雨天，有時還會下豬", tags: ["想像"] }, { title: "君偉上小學", tags: ["校園","生活"] }, { title: "羅達爾系列", tags: ["奇幻","經典"] },
+                { title: "神奇柑仔店", tags: ["奇幻","品格"] }, { title: "用點心學校", tags: ["幽默","語文"] }, { title: "屁屁偵探讀本", tags: ["推理"] },
+                { title: "科學實驗王", tags: ["科普","漫畫"] }, { title: "妖怪手錶", tags: ["幽默"] }, { title: "露露和拉拉", tags: ["友情","烹飪"] },
+                { title: "黑貓魯道夫", tags: ["冒險","成長"] }, { title: "窗邊的小荳荳", tags: ["教育","經典"] }, { title: "夏綠蒂的網", tags: ["友情","生命"] },
+                { title: "大偵探奈特", tags: ["推理"] }, { title: "字的童話", tags: ["語文"] }, { title: "晴空小侍郎", tags: ["奇幻","文學"] },
+                { title: "火龍家庭故事集", tags: ["幽默"] }, { title: "丁丁歷險記", tags: ["冒險","經典"] }, { title: "小頭目優瑪", tags: ["原民","奇幻"] },
+                { title: "可能小學的歷史任務", tags: ["歷史","穿越"] }, { title: "晨讀10分鐘", tags: ["閱讀"] }, { title: "西遊記(兒童版)", tags: ["經典"] },
+                { title: "三國演義(兒童版)", tags: ["經典","歷史"] }, { title: "福爾摩斯(兒童版)", tags: ["推理"] }, { title: "亞森羅蘋(兒童版)", tags: ["推理"] }
+            ]},
+            { ageMin: 10, ageMax: 18, list: [
+                { title: "哈利波特", tags: ["奇幻","經典"] }, { title: "波西傑克森", tags: ["神話","冒險"] }, { title: "修煉", tags: ["奇幻","東方"] },
+                { title: "貓戰士", tags: ["冒險","動物"] }, { title: "飢餓遊戲", tags: ["反烏托邦"] }, { title: "小王子", tags: ["哲學","經典"] },
+                { title: "第十四道門", tags: ["驚悚","奇幻"] }, { title: "少年小樹之歌", tags: ["自然","成長"] }, { title: "金庸武俠小說", tags: ["武俠","經典"] },
+                { title: "魔戒", tags: ["奇幻","史詩"] }, { title: "亞森羅蘋", tags: ["推理"] }, { title: "福爾摩斯", tags: ["推理"] },
+                { title: "暮光之城", tags: ["愛情","奇幻"] }, { title: "移動迷宮", tags: ["科幻","冒險"] }, { title: "分歧者", tags: ["科幻"] },
+                { title: "偷書賊", tags: ["歷史","人性"] }, { title: "奇蹟男孩", tags: ["勵志","校園"] }, { title: "別相信任何人", tags: ["懸疑"] },
+                { title: "解憂雜貨店", tags: ["溫馨","懸疑"] }, { title: "手斧男孩", tags: ["求生","冒險"] }, { title: "許願樹", tags: ["幽默","自然"] },
+                { title: "牧羊少年奇幻之旅", tags: ["哲學","旅行"] }, { title: "深夜食堂", tags: ["生活","漫畫"] }, { title: "龍騎俠", tags: ["奇幻"] },
+                { title: "地海傳說", tags: ["奇幻","經典"] }, { title: "風之影", tags: ["懸疑","文學"] }
+            ]}
+        ];
+
+        // Refined Games with Tags
+        const GAMES_LIBRARY = [
+            { ageMin: 0, ageMax: 2, list: [
+                { title: "疊疊杯", tags: ["手眼協調"] }, { title: "軟積木", tags: ["觸覺"] }, { title: "形狀配對盒", tags: ["認知","精細動作"] },
+                { title: "觸覺球", tags: ["感覺統合"] }, { title: "布書", tags: ["視覺","觸覺"] }, { title: "敲擊樂器", tags: ["聽覺","節奏"] },
+                { title: "滾球塔", tags: ["追視","因果"] }, { title: "推拉玩具", tags: ["大動作"] }, { title: "音樂鈴", tags: ["安撫"] },
+                { title: "六面聲光盒", tags: ["探索"] }, { title: "手抓板拼圖", tags: ["配對"] }, { title: "洗澡書", tags: ["生活"] },
+                { title: "安撫巾", tags: ["安撫"] }, { title: "波波球", tags: ["觸覺"] }, { title: "多功能健力架", tags: ["大動作"] }
+            ]},
+            { ageMin: 2, ageMax: 4, list: [
+                { title: "三隻小豬", tags: ["邏輯","空間"] }, { title: "推推松鼠", tags: ["邏輯","規劃"] }, { title: "彩虹小馬", tags: ["運氣","擲骰"] },
+                { title: "城市小旅行", tags: ["手牌管理","顏色"] }, { title: "動物變裝秀", tags: ["邏輯","配對"] }, { title: "諾亞方舟", tags: ["平衡","手眼協調"] },
+                { title: "拔毛運動會", tags: ["記憶"] }, { title: "釣魚遊戲", tags: ["專注","手眼協調"] }, { title: "樂高得寶", tags: ["建構","創意"] },
+                { title: "記憶翻牌", tags: ["記憶"] }, { title: "醜娃娃", tags: ["反應","觀察"] }, { title: "哆寶", tags: ["反應","觀察"] },
+                { title: "企鵝破冰", tags: ["手部控制"] }, { title: "平衡仙人掌", tags: ["平衡"] }, { title: "木製切切樂", tags: ["角色扮演"] },
+                { title: "磁力片", tags: ["建構"] }, { title: "黏土工具組", tags: ["創造"] }, { title: "大型地板拼圖", tags: ["空間"] },
+                { title: "穿繩遊戲", tags: ["精細動作"] }, { title: "釣鴨子", tags: ["專注"] }
+            ]},
+            { ageMin: 4, ageMax: 7, list: [
+                { title: "超級犀牛", tags: ["平衡","手部控制"] }, { title: "磁石魔法迷宮", tags: ["記憶","創意"] }, { title: "獅子剪髮大冒險", tags: ["合作","記憶"] },
+                { title: "狐狸在哪裡", tags: ["合作","推理"] }, { title: "石器時代兒童版", tags: ["記憶","資源"] }, { title: "閃靈快手", tags: ["反應","邏輯"] },
+                { title: "睡皇后", tags: ["運氣","簡單策略"] }, { title: "卡卡頌(兒童版)", tags: ["策略","觀察"] }, { title: "妙語說書人", tags: ["表達","想像"] },
+                { title: "德國心臟病", tags: ["反應","加法"] }, { title: "傳情畫意", tags: ["畫畫","表達"] }, { title: "髒小豬", tags: ["策略","運氣"] },
+                { title: "誰是牛頭王", tags: ["數字","邏輯"] }, { title: "冰酷企鵝", tags: ["技巧"] }, { title: "小白世紀", tags: ["冒險"] },
+                { title: "跳跳猴大作戰", tags: ["手部控制"] }, { title: "伐木達人", tags: ["手部控制"] }, { title: "快手疊杯", tags: ["反應","競速"] },
+                { title: "推倒提基", tags: ["策略"] }, { title: "小羊躲貓貓", tags: ["記憶"] }, { title: "雞同鴨搶", tags: ["策略"] },
+                { title: "龍之吐息", tags: ["觀察","收集"] }, { title: "萌犬對對碰", tags: ["觀察","反應"] }, { title: "披薩大亨", tags: ["數學","速度"] }
+            ]},
+            { ageMin: 7, ageMax: 12, list: [
+                { title: "多米諾王國", tags: ["策略","板塊"] }, { title: "蟲蟲燒烤派對", tags: ["運氣","數學"] }, { title: "牙買加", tags: ["競速","運氣"] },
+                { title: "米寶馬戲團", tags: ["動作","疊疊樂"] }, { title: "全力衝廁", tags: ["手牌管理","數字"] }, { title: "洞察掀機", tags: ["觀察","猜測"] },
+                { title: "帽子戲法", tags: ["反應","觀察"] }, { title: "乾杯", tags: ["記憶","心機"] }, { title: "飛躍魔盜團", tags: ["合作","即時"] },
+                { title: "神奈川學苑", tags: ["收集","美感"] }, { title: "夢想家園", tags: ["規劃","家庭"] }, { title: "星球防衛者", tags: ["策略","規劃"] },
+                { title: "巫術學院", tags: ["連鎖","收集"] }, { title: "卡卡頌", tags: ["策略","板塊放置"] }, { title: "拉密", tags: ["邏輯","數字"] },
+                { title: "矮人礦坑", tags: ["陣營","心機"] }, { title: "璀璨寶石", tags: ["資源管理","策略"] }, { title: "票務大師", tags: ["規劃","策略"] },
+                { title: "犯人在跳舞", tags: ["推裡","派對"] }, { title: "產地直送", tags: ["經營"] }, { title: "駱駝大賽", tags: ["運氣","博奕"] },
+                { title: "鐵道任務", tags: ["規劃"] }, { title: "爆炸貓", tags: ["派對","運氣"] }, { title: "花磚物語", tags: ["美感","策略"] },
+                { title: "七大奇蹟", tags: ["文明","輪抽"] }, { title: "情書", tags: ["推理","運氣"] }, { title: "富饒之城", tags: ["角色能力","建設"] },
+                { title: "印加寶藏", tags: ["風險評估"] }, { title: "皇輿爭霸", tags: ["牌庫構築"] }, { title: "石器時代", tags: ["工人放置"] },
+                { title: "小世界", tags: ["區域控制"] }, { title: "卡坦島", tags: ["交易","建設"] }, { title: "瘟疫危機", tags: ["合作"] }
+            ]},
+            { ageMin: 12, ageMax: 18, list: [
+                { title: "古代 (Antiquity)", tags: ["重度策略","經營"] }, { title: "Gloomhaven", tags: ["冒險","合作"] }, { title: "魔戒LCG", tags: ["卡牌","合作"] },
+                { title: "冰與火之歌戰棋", tags: ["對戰","模型"] }, { title: "Android Netrunner", tags: ["對戰","陣營"] }, { title: "Wishland", tags: ["策略","建設"] },
+                { title: "三國得志", tags: ["三人","策略"] }, { title: "貓島奇緣", tags: ["板塊","策略"] }, { title: "熊熊公園", tags: ["板塊","拼放"] },
+                { title: "平衡獸", tags: ["平衡","科技"] }, { title: "波多黎各", tags: ["策略","經營"] }, { title: "風聲", tags: ["陣營","心機"] },
+                { title: "狼人殺", tags: ["陣營","口才"] }, { title: "卡坦島", tags: ["策略","交易"] }, { title: "瘟疫危機", tags: ["合作","策略"] },
+                { title: "說書人", tags: ["聯想"] }, { title: "妙語說書人", tags: ["聯想"] }, { title: "截碼戰", tags: ["團隊","推理"] },
+                { title: "蓋亞計劃", tags: ["重度策略"] }, { title: "鐮刀戰爭", tags: ["區域控制"] }, { title: "電力公司", tags: ["競標","經營"] },
+                { title: "農家樂", tags: ["工人放置"] }, { title: "神秘大地", tags: ["區域控制"] }, { title: "血契獵殺", tags: ["陣營","推理"] },
+                { title: "機密代號", tags: ["聯想","派對"] }, { title: "阿瓦隆", tags: ["陣營","邏輯"] }, { title: "山中小屋", tags: ["劇本","冒險"] },
+                { title: "大西部之路", tags: ["策略"] }, { title: "火星雅利", tags: ["策略"] }, { title: "殖民火星", tags: ["引擎構築"] }
+            ]}
+        ];
+
+        const DATA_VACCINES = [
+            { ageMo: 0, name: "B型肝炎疫苗(第一劑)" }, { ageMo: 1, name: "B型肝炎疫苗(第二劑)" }, { ageMo: 2, name: "13價結合型肺炎鏈球菌疫苗(第一劑)" }, { ageMo: 2, name: "五合一疫苗(第一劑)" }, { ageMo: 2, name: "口服輪狀病毒疫苗(第一劑/自費)" }, { ageMo: 2, name: "腸病毒71型疫苗(第一劑/自費)" }, { ageMo: 2, name: "B型腦膜炎雙球菌疫苗(第一劑/自費)" },
+            { ageMo: 4, name: "13價結合型肺炎鏈球菌疫苗(第二劑)" }, { ageMo: 4, name: "五合一疫苗(第二劑)" }, { ageMo: 4, name: "口服輪狀病毒疫苗(第二劑/自費)" }, { ageMo: 4, name: "腸病毒71型疫苗(第二劑/自費)" }, { ageMo: 4, name: "B型腦膜炎雙球菌疫苗(第二劑/自費)" },
+            { ageMo: 6, name: "B型肝炎疫苗(第三劑)" }, { ageMo: 6, name: "五合一疫苗(第三劑)" }, { ageMo: 6, name: "流感疫苗(每年10月,初次打2劑)" },
+            { ageMo: 12, name: "麻疹腮腺炎德國麻疹混合疫苗(第一劑)" }, { ageMo: 12, name: "水痘疫苗(第一劑)" }, { ageMo: 12, name: "13價結合型肺炎鏈球菌疫苗(第三劑)" }, { ageMo: 12, name: "腸病毒71型疫苗(第三劑/自費)" }, { ageMo: 12, name: "B型腦膜炎雙球菌疫苗(第三劑/自費)" },
+            { ageMo: 15, name: "日本腦炎疫苗(第一劑)" },
+            { ageMo: 18, name: "五合一疫苗(第四劑)" }, { ageMo: 18, name: "A型肝炎疫苗(第一劑)" },
+            { ageMo: 27, name: "日本腦炎疫苗(第二劑)" }, { ageMo: 27, name: "A型肝炎疫苗(第二劑)" },
+            { ageMo: 60, name: "麻疹腮腺炎德國麻疹混合疫苗(第二劑)" }, { ageMo: 60, name: "四合一疫苗(單一劑)" }, { ageMo: 60, name: "水痘疫苗(第二劑/自費)" }
+        ];
+
+        const DATA_DEVELOPMENT = [
+            { minMo: 0, maxMo: 2, items: ["趴著時能稍微抬頭", "眼睛會追隨移動的物體", "聽到聲音會轉頭或停止動作", "會發出咕咕聲或笑聲"] },
+            { minMo: 2, maxMo: 4, items: ["脖子變硬，抱直時頭能豎直", "手能張開，會想抓握東西", "會發出阿、嗚等母音", "逗弄時會微笑回應"] },
+            { minMo: 4, maxMo: 6, items: ["會翻身(由趴變仰或仰變趴)", "手會伸手抓東西放嘴巴", "會轉頭尋找聲源", "看到照顧者會高興"] },
+            { minMo: 6, maxMo: 9, items: ["能獨立坐穩", "會用手掌抓握積木", "會發出爸、媽等單音", "會怕生，依賴主要照顧者"] },
+            { minMo: 9, maxMo: 12, items: ["會扶著東西站立或遊走", "會用拇指和食指捏起小東西", "聽懂簡單指令(如:過來)", "會拍手或揮手再見"] },
+            { minMo: 12, maxMo: 18, items: ["放手走幾步路", "會疊2塊積木", "有意義的叫爸爸/媽媽", "會用手指指出想要的東西"] },
+            { minMo: 18, maxMo: 24, items: ["會跑步和踢球", "會自己拿湯匙吃飯", "會講至少10個單字", "會模仿大人的動作"] },
+            { minMo: 24, maxMo: 36, items: ["會雙腳跳", "會畫圓圈或直線", "會講短句(我要喝水)", "會自己脫簡單的衣褲"] },
+            { minMo: 36, maxMo: 48, items: ["會單腳站立片刻", "會畫人(有頭和身體)", "會問為什麼", "會與其他小朋友一起玩"] },
+            { minMo: 48, maxMo: 60, items: ["會單腳跳", "會畫十字或方形", "能敘述簡單故事", "會自己穿脫衣服扣釦子"] },
+            { minMo: 60, maxMo: 84, items: ["會騎腳踏車(輔助輪)", "會寫自己的名字", "口齒清晰", "遵守遊戲規則"] }
+        ];
+
+        // Teeth Data (Symmetric layout)
+        const TEETH_LAYOUT = {
+            primary: [
+                { type: 'incisor', angle: 10, erupt: [6,12], shed: [72,84] },
+                { type: 'incisor', angle: 25, erupt: [9,16], shed: [84,96] },
+                { type: 'canine',  angle: 45, erupt: [16,23], shed: [108,144] },
+                { type: 'molar',   angle: 65, erupt: [13,19], shed: [108,132] },
+                { type: 'molar',   angle: 85, erupt: [23,33], shed: [120,144] }
+            ],
+            permanent: [
+                { type: 'incisor', angle: 8, erupt: [72,96] },
+                { type: 'incisor', angle: 20, erupt: [84,108] },
+                { type: 'canine',  angle: 35, erupt: [108,144] },
+                { type: 'molar',   angle: 50, erupt: [120,144] },
+                { type: 'molar',   angle: 65, erupt: [120,144] },
+                { type: 'molar',   angle: 80, erupt: [72,84] },
+                { type: 'molar',   angle: 95, erupt: [132,156] },
+                { type: 'molar',   angle: 110, erupt: [204,252] }
+            ]
+        };
+
+        // --- CORE MATH ---
+        function getLMS(gender, type, months) { /* Same as before */
+            const data = DATA_SOURCES[gender][type];
+            if (!data) return null;
+            if (months <= data[0][0]) return {L: data[0][1], M: data[0][2], S: data[0][3]};
+            if (months >= data[data.length-1][0]) { const last = data[data.length-1]; return {L: last[1], M: last[2], S: last[3]}; }
+            for (let i = 0; i < data.length - 1; i++) {
+                if (months >= data[i][0] && months < data[i+1][0]) {
+                    const t = (months - data[i][0]) / (data[i+1][0] - data[i][0]);
+                    return { L: data[i][1] + t * (data[i+1][1] - data[i][1]), M: data[i][2] + t * (data[i+1][2] - data[i][2]), S: data[i][3] + t * (data[i+1][3] - data[i][3]) };
+                }
+            }
+            return null;
+        }
+        function calculateZ(val, L, M, S) { return (L===0) ? Math.log(val/M)/S : (Math.pow(val/M, L)-1)/(L*S); }
+        function erf(x) { var m=1.0,s=1.0,sum=x*1.0; for(var i=1;i<50;i++){ m*=i;s*=-1;sum+=(s*Math.pow(x,2.0*i+1.0))/(m*(2.0*i+1.0));} return 2*sum/Math.sqrt(Math.PI); }
+        function zToPercentile(z) { if(isNaN(z))return'--'; if(z>5)return'>99.9'; if(z<-5)return'<0.1'; let p=(0.5*(1+erf(z/Math.sqrt(2))))*100; if(p<0.1)return'<0.1'; if(p>99.9)return'>99.9'; return p.toFixed(1); }
+        function getValFromZ(z,L,M,S) { return (L===0) ? M*Math.exp(S*z) : M*Math.pow((1+L*S*z),1/L); }
+        function calculateWater(weight) {
+            if(!weight || weight<=0) return '--';
+            let w = weight, water=0;
+            if(w<=10) water=w*100; else if(w<=20) water=1000+(w-10)*50; else water=1500+(w-20)*20;
+            return Math.round(water)+' ml';
+        }
+
+        // --- APP STATE ---
+        let appData = { children: [] };
+        let currentChildId = null;
+        let chartInstance = null;
+        let currentChartType = 'height';
+        let confirmCallback = null;
+        let currentView = 'listView';
+        let currentTab = 'record';
+
+        function loadData() {
+            const saved = localStorage.getItem('sheepGrowthApp');
+            if (saved) { appData = JSON.parse(saved); appData.children.forEach(c => { if(!c.records) c.records=[]; }); }
+            renderChildList();
+            
+            const savedState = localStorage.getItem('sheepAppState');
+            if(savedState) {
+                const state = JSON.parse(savedState);
+                if(state.view === 'detailView' && state.childId) {
+                     const child = appData.children.find(c => c.id === state.childId);
+                     if(child) {
+                         openChildDetail(state.childId);
+                         if(state.tab) switchDetailTab(state.tab);
+                     }
+                }
+            }
+        }
+        function saveData() { localStorage.setItem('sheepGrowthApp', JSON.stringify(appData)); }
+        function saveAppState() { localStorage.setItem('sheepAppState', JSON.stringify({ view: currentView, childId: currentChildId, tab: currentTab })); }
+
+        // --- DATA BACKUP ---
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "sheep_growth_backup_" + moment().format('YYYYMMDD') + ".json");
+            dlAnchorElem.click();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data && data.children && confirm('確定要匯入資料嗎？這將會覆蓋現有的紀錄。')) {
+                        appData = data; saveData(); loadData(); showAlert('成功', '資料已成功還原！');
+                    }
+                } catch (err) { showAlert('錯誤', '無法讀取檔案'); }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- DATE INPUT LOGIC ---
+        function setDateInputs(prefix, dateStr) {
+            const m = moment(dateStr); if (!m.isValid()) return;
+            document.getElementById(prefix + 'Month').value = m.month() + 1;
+            document.getElementById(prefix + 'Day').value = m.date();
+            const y = m.year();
+            document.getElementById(prefix + 'Year').value = y - 1911; // Default ROC
+        }
+        function getDateStringFromInputs(prefix) {
+            let y = parseInt(document.getElementById(prefix + 'Year').value);
+            const m = parseInt(document.getElementById(prefix + 'Month').value);
+            const d = parseInt(document.getElementById(prefix + 'Day').value);
+            if (!y || !m || !d) return null;
+            if (y < 1911) y += 1911; // Auto detect ROC
+            const dateObj = moment(`${y}-${m}-${d}`, 'YYYY-M-D');
+            return dateObj.isValid() ? dateObj.format('YYYY-MM-DD') : null;
+        }
+
+        // --- UI FUNCTIONS ---
+        function applyTheme(gender) {
+            document.body.classList.remove('theme-boy', 'theme-girl');
+            if(gender==='boy') document.body.classList.add('theme-boy');
+            else if(gender==='girl') document.body.classList.add('theme-girl');
+        }
+        function resetTheme() { document.body.classList.remove('theme-boy', 'theme-girl'); }
+
+        function showView(viewName) {
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('hidden');
+            document.getElementById(viewName).classList.remove('hidden');
+            currentView = viewName;
+            if(viewName === 'listView') { 
+                renderChildList(); 
+                currentChildId = null; 
+                resetTheme(); 
+            }
+            saveAppState();
+        }
+
+        function renderChildList() {
+            const container = document.getElementById('childrenContainer');
+            const emptyState = document.getElementById('emptyState');
+            container.innerHTML = '';
+            if (appData.children.length === 0) { emptyState.classList.remove('hidden'); return; }
+            emptyState.classList.add('hidden');
+            appData.children.forEach(child => {
+                const ageStr = getAgeString(child.dob, moment());
+                const genderIcon = child.gender === 'boy' ? '👦' : '👧';
+                const borderColor = child.gender === 'boy' ? 'border-blue-100 hover:border-blue-300' : 'border-pink-100 hover:border-pink-300';
+                const card = document.createElement('div');
+                card.className = `bg-white p-5 rounded-xl border ${borderColor} shadow-sm hover:shadow-md transition cursor-pointer flex justify-between items-center`;
+                card.onclick = () => openChildDetail(child.id);
+                card.innerHTML = `<div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full flex items-center justify-center text-2xl border bg-gray-50 border-gray-100">${genderIcon}</div><div><h3 class="font-bold text-lg text-gray-800">${child.name}</h3><p class="text-xs text-gray-500">${child.dob} (${ageStr})</p><span class="text-xs mt-1 inline-block bg-gray-50 px-2 py-0.5 rounded text-gray-600">紀錄: ${child.records.length} 筆</span></div></div><div class="text-gray-400"><i class="fas fa-chevron-right"></i></div>`;
+                container.appendChild(card);
+            });
+        }
+
+        function saveNewChild() {
+            const name = document.getElementById('newChildName').value.trim();
+            const gender = document.querySelector('input[name="newChildGender"]:checked').value;
+            const dob = getDateStringFromInputs('newChild');
+            if (!name || !dob) { showAlert('資料不完整', '請填寫完整日期與暱稱！'); return; }
+            const age = moment().diff(moment(dob), 'years', true);
+            if (age < 0) { showAlert('日期錯誤', '出生日期不能晚於今天。'); return; }
+            if (age > 99) { showAlert('年齡限制', '僅支援 0-99 歲的生長紀錄。'); return; }
+            appData.children.push({ id: Date.now().toString(), name, gender, dob, records: [] });
+            saveData(); closeModal('addChildModal'); document.getElementById('addChildForm').reset(); renderChildList();
+        }
+
+        function openChildDetail(id) {
+            currentChildId = id;
+            const child = appData.children.find(c => c.id === id);
+            if(!child) return;
+            
+            showView('detailView'); // Update state inside
+            applyTheme(child.gender);
+            document.getElementById('detailName').innerText = child.name;
+            document.getElementById('detailDob').innerText = child.dob;
+            document.getElementById('detailGender').innerText = child.gender === 'boy' ? '男寶' : '女寶';
+            document.getElementById('detailGender').className = `px-2 py-1 rounded text-xs font-bold ${child.gender === 'boy' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-500'}`;
+            document.getElementById('detailAge').innerText = getAgeString(child.dob, moment());
+            const currentAgeYears = moment().diff(moment(child.dob), 'years', true);
+            updateDoctorAdvice(currentAgeYears, child.gender);
+            
+            // Set Default Record Date (ROC)
+            setDateInputs('rec', moment().format('YYYY-MM-DD'));
+            
+            document.getElementById('recHeight').value = ''; document.getElementById('recWeight').value = ''; document.getElementById('recHead').value = '';
+            document.getElementById('instantResult').classList.add('hidden');
+            renderHistoryTable(child);
+            renderTeeth(moment().diff(moment(child.dob), 'months', true));
+            switchDetailTab(currentTab || 'record');
+        }
+        
+        function updateDoctorAdvice(ageYears, gender) {
+            const adviceData = ADVICE_DATA.find(d => {
+                const ageMatch = ageYears >= d.min && ageYears < d.max;
+                const genderMatch = !d.gender || d.gender === gender;
+                return ageMatch && genderMatch;
+            });
+            const defaultAdvice = { title: "健康成長", list: ["每個孩子都有自己的生長軌跡，健康快樂最重要！", "均衡飲食、充足睡眠、適度運動是長高的三大法寶。"] };
+            const finalAdvice = adviceData || defaultAdvice;
+            const randomText = finalAdvice.list[Math.floor(Math.random() * finalAdvice.list.length)];
+            document.getElementById('adviceTitle').innerText = finalAdvice.title;
+            document.getElementById('adviceText').innerText = randomText;
+        }
+
+        function deleteCurrentChild() {
+            showConfirm('刪除確認', '確定要刪除這位寶寶的所有資料嗎？刪除後無法復原喔！', () => {
+                appData.children = appData.children.filter(c => c.id !== currentChildId);
+                saveData(); showView('listView');
+            });
+        }
+
+        function calculatePrediction() {
+            const dad = parseFloat(document.getElementById('predDad').value);
+            const mom = parseFloat(document.getElementById('predMom').value);
+            const child = appData.children.find(c => c.id === currentChildId);
+            
+            if (!dad || !mom || !child) { showAlert('資料不足', '請輸入爸爸與媽媽的身高。'); return; }
+
+            let base = 0;
+            if (child.gender === 'boy') base = (dad + mom + 12) / 2;
+            else base = (dad + mom - 12) / 2;
+
+            const rangeMin = (base - 7.5).toFixed(1);
+            const rangeMax = (base + 7.5).toFixed(1);
+            
+            document.getElementById('predValue').innerText = base.toFixed(1);
+            document.getElementById('predRange').innerText = `${rangeMin} ~ ${rangeMax} cm`;
+            document.getElementById('predResult').classList.remove('hidden');
+        }
+
+        function renderDevelopment(ageMonths) {
+            const container = document.getElementById('devListContainer');
+            container.innerHTML = '';
+            const stage = DATA_DEVELOPMENT.find(s => ageMonths >= s.minMo && ageMonths < s.maxMo);
+            
+            if (!stage) {
+                const msg = ageMonths > 84 ? "學齡後：注重學校適應與常規建立。" : "新生兒：請多觀察吃睡狀況。";
+                document.getElementById('devAgeStage').innerText = ageMonths > 84 ? "學齡後" : "新生兒";
+                container.innerHTML = `<div class="p-4 text-center text-gray-500">${msg}</div>`;
+                return;
+            }
+
+            document.getElementById('devAgeStage').innerText = `${stage.minMo}~${stage.maxMo} 個月`;
+            stage.items.forEach(item => {
+                container.innerHTML += `<div class="flex items-start gap-3 bg-white p-3 rounded-lg border border-gray-100 shadow-sm"><div class="mt-1 w-5 h-5 rounded-full border-2 border-theme text-theme-primary flex items-center justify-center text-xs flex-shrink-0"><i class="fas fa-check"></i></div><span class="text-gray-700 font-medium">${item}</span></div>`;
+            });
+        }
+
+        function renderVaccines(ageMonths, dob) {
+            const container = document.getElementById('vaccineListContainer');
+            container.innerHTML = '';
+            const dobDate = moment(dob);
+            
+            const grouped = {};
+            DATA_VACCINES.forEach(v => { if(!grouped[v.ageMo]) grouped[v.ageMo]=[]; grouped[v.ageMo].push(v.name); });
+            const ages = Object.keys(grouped).map(Number).sort((a,b)=>a-b);
+
+            ages.forEach(ageMo => {
+                const names = grouped[ageMo];
+                const dueDate = dobDate.clone().add(ageMo, 'months');
+                const diffMonths = ageMonths - ageMo;
+                
+                let sClass="border-gray-200 bg-gray-50", sIcon="circle", sColor="text-gray-300", sText="";
+
+                if (diffMonths >= 1) { 
+                    sClass="border-green-100 bg-green-50"; sIcon="check-circle"; sColor="text-green-600"; sText="應已施打";
+                } else if (diffMonths >= -1 && diffMonths < 1) { 
+                    sClass="border-yellow-100 bg-yellow-50"; sIcon="clock"; sColor="text-yellow-500"; sText="近期留意";
+                } else { 
+                    sClass="border-blue-100 bg-blue-50"; sIcon="calendar-alt"; sColor="text-blue-500"; sText="預計 "+dueDate.format('YYYY/MM');
+                }
+
+                const ageLabel = ageMo === 0 ? '出生24h內' : (ageMo >= 12 ? `${Math.floor(ageMo/12)}歲${ageMo%12?ageMo%12+'個月':''}` : `${ageMo}個月`);
+                const namesHtml = names.map(n => `<div class="mb-1 text-sm font-bold text-gray-700 flex items-start gap-2"><span class="text-gray-400 mt-1 text-[10px]">●</span><span>${n}</span></div>`).join('');
+
+                container.innerHTML += `<div class="flex justify-between items-center p-4 rounded-xl border ${sClass} shadow-sm"><div class="flex-1"><div class="text-xs text-gray-500 mb-2 font-mono bg-white inline-block px-2 py-0.5 rounded border border-gray-200">${ageLabel}</div><div class="pl-1">${namesHtml}</div></div><div class="flex flex-col items-end ml-3 min-w-[80px]"><i class="fas fa-${sIcon} ${sColor} text-2xl mb-1"></i><span class="text-xs font-bold ${sColor} text-right">${sText}</span></div></div>`;
+            });
+        }
+
+        function renderTeeth(ageMonths) {
+            document.getElementById('teethAgeDisplay').innerText = (ageMonths/12).toFixed(1) + " 歲";
+            
+            ['upper', 'lower'].forEach(pos => {
+                const container = document.getElementById('jaw' + (pos === 'upper' ? 'Upper' : 'Lower'));
+                const label = container.querySelector('.arch-label');
+                container.innerHTML = ''; 
+                container.appendChild(label);
+                
+                const centerX = 150; 
+                // Identical Anchor and Radii for Symmetry
+                const anchorY = pos === 'upper' ? 140 : 20; 
+                const rPermX = 100; const rPermY = 90;
+                const rPrimaryX = 70; const rPrimaryY = 60;
+
+                const anchorY_actual = pos === 'upper' ? 130 : 30; // Symmetric anchors
+
+                TEETH_LAYOUT.permanent.forEach(t => renderToothPair(container, t, ageMonths, centerX, anchorY_actual, pos, rPermX, rPermY, 'permanent'));
+                TEETH_LAYOUT.primary.forEach(t => renderToothPair(container, t, ageMonths, centerX, anchorY_actual, pos, rPrimaryX, rPrimaryY, 'primary'));
+            });
+
+            let text = "恆牙列期，28-32顆牙齒逐漸長齊。";
+            if (ageMonths < 6) text = "寶寶還在長牙準備期，可以用紗布巾清潔牙齦喔！";
+            else if (ageMonths < 30) text = "乳牙萌發期，大約 6-10 個月長第一顆牙。";
+            else if (ageMonths < 72) text = "乳牙列完成期，共有20顆乳牙。請協助孩子使用牙線。";
+            else if (ageMonths < 144) text = "換牙期，乳牙開始脫落，恆牙萌發。注意六歲大臼齒清潔。";
+            document.getElementById('teethStageText').innerText = text;
+        }
+
+        function renderToothPair(container, data, age, cx, anchorY, jawPos, rx, ry, type) {
+            const rad = data.angle * (Math.PI / 180);
+            const dx = Math.sin(rad) * rx;
+            const dy = Math.cos(rad) * ry;
+            
+            let y, rotL, rotR;
+            
+            if (jawPos === 'upper') {
+                y = anchorY - dy;
+                rotL = -data.angle;
+                rotR = data.angle;
+            } else {
+                y = anchorY + dy;
+                rotL = 180 + data.angle;
+                rotR = 180 - data.angle;
+            }
+
+            let status = 'shed';
+            let isErupted = age >= data.erupt[0];
+            let isShed = false;
+            if (data.shed) isShed = age >= data.shed[0];
+
+            if (type === 'primary') {
+                if (isShed) status = 'shed';
+                else if (isErupted) status = 'erupted';
+                else status = 'shed'; 
+            } else {
+                if (isErupted) status = 'erupted';
+                else status = 'shed'; 
+            }
+
+            [-1, 1].forEach(side => {
+                const el = document.createElement('div');
+                el.className = `tooth-container`;
+                el.style.left = `${(cx + (side * dx)) - 12}px`; 
+                el.style.top = `${y - 20}px`; 
+                
+                const rotation = side === -1 ? rotL : rotR;
+                el.style.transform = `rotate(${rotation}deg)`;
+
+                const mark = document.createElement('div');
+                mark.className = `tooth-mark ${type} ${status} ${data.type}`;
+                
+                el.appendChild(mark);
+                container.appendChild(el);
+            });
+        }
+
+        function renderRecommendations(ageYears) {
+            const bookContainer = document.getElementById('bookList');
+            const gameContainer = document.getElementById('gameList');
+            bookContainer.innerHTML = ''; gameContainer.innerHTML = '';
+
+            const bookCat = BOOKS_LIBRARY.find(b => ageYears >= b.ageMin && ageYears < b.ageMax) || BOOKS_LIBRARY[BOOKS_LIBRARY.length-1];
+            const gameCat = GAMES_LIBRARY.find(g => ageYears >= g.ageMin && ageYears < g.ageMax) || GAMES_LIBRARY[GAMES_LIBRARY.length-1];
+
+            const shuffledBooks = [...bookCat.list].sort(() => 0.5 - Math.random()).slice(0, 5);
+            const randomGame = gameCat.list[Math.floor(Math.random() * gameCat.list.length)];
+
+            shuffledBooks.forEach(book => {
+                const tagsHtml = book.tags.map(t => `<span class="item-tag book">${t}</span>`).join('');
+                bookContainer.innerHTML += `<div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100 hover:bg-white hover:shadow-sm transition"><div class="w-8 h-8 flex-shrink-0 bg-theme-accent text-theme-primary rounded flex items-center justify-center font-bold text-lg"><i class="fas fa-book"></i></div><div><div class="text-sm font-medium text-gray-700">${book.title}</div><div class="mt-1">${tagsHtml}</div></div></div>`;
+            });
+            
+            const gameTagsHtml = randomGame.tags.map(t => `<span class="item-tag game">${t}</span>`).join('');
+            gameContainer.innerHTML = `<div class="flex items-center gap-3 bg-yellow-50 p-3 rounded-lg border border-yellow-100 hover:bg-white hover:shadow-sm transition"><div class="w-8 h-8 flex-shrink-0 bg-yellow-200 text-yellow-700 rounded flex items-center justify-center font-bold text-lg"><i class="fas fa-dice"></i></div><div><div class="text-sm font-medium text-gray-700">${randomGame.title}</div><div class="mt-1">${gameTagsHtml}</div></div></div>`;
+        }
+
+        function refreshRecommendations() {
+             const child = appData.children.find(c => c.id === currentChildId);
+             if(!child) return;
+             renderRecommendations(moment().diff(moment(child.dob), 'years', true));
+        }
+
+        function switchDetailTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            const child = appData.children.find(c => c.id === currentChildId); if(!child) return;
+            const ageMonths = moment().diff(moment(child.dob), 'months', true);
+            const ageYears = moment().diff(moment(child.dob), 'years', true);
+
+            currentTab = tabName;
+            saveAppState();
+
+            if(tabName === 'chart') updateChart();
+            if(tabName === 'teeth') renderTeeth(ageMonths);
+            if(tabName === 'recommend') renderRecommendations(ageYears);
+            if(tabName === 'development') renderDevelopment(ageMonths);
+            if(tabName === 'vaccine') renderVaccines(ageMonths, child.dob);
+        }
+
+        function addRecord() {
+            const child = appData.children.find(c => c.id === currentChildId);
+            const date = getDateStringFromInputs('rec');
+            const h = parseFloat(document.getElementById('recHeight').value);
+            const w = parseFloat(document.getElementById('recWeight').value);
+            const hd = parseFloat(document.getElementById('recHead').value);
+
+            if (!date || (!h && !w && !hd)) { showAlert('資料不足', '請至少輸入日期和一項測量數據。'); return; }
+            const recAge = moment(date).diff(moment(child.dob), 'years', true);
+            if (recAge < 0) { showAlert('日期錯誤', '測量日期不能早於出生日期。'); return; }
+            if (recAge > 99) { showAlert('年齡限制', '僅支援 99 歲以下的測量紀錄。'); return; }
+
+            child.records.push({ id: Date.now().toString(), date, height: h||null, weight: w||null, head: hd||null });
+            child.records.sort((a,b) => new Date(a.date) - new Date(b.date));
+            saveData();
+            
+            const ageMonths = moment(date).diff(moment(child.dob), 'months', true);
+            const resH = h ? calculatePercentile(child.gender, 'height', ageMonths, h) : '--';
+            const resW = w ? calculatePercentile(child.gender, 'weight', ageMonths, w) : '--';
+            const resHd = hd ? calculatePercentile(child.gender, 'head', ageMonths, hd) : '--';
+            const resWater = w ? calculateWater(w) : '--';
+            
+            document.getElementById('resHeight').innerText = resH + (resH !== '--' ? '%' : '');
+            document.getElementById('resWeight').innerText = resW + (resW !== '--' ? '%' : '');
+            document.getElementById('resHead').innerText = resHd + (resHd !== '--' ? '%' : '');
+            document.getElementById('resWater').innerText = resWater;
+            document.getElementById('instantResult').classList.remove('hidden');
+            renderHistoryTable(child);
+        }
+
+        function renderHistoryTable(child) {
+            const tbody = document.getElementById('historyTableBody'); tbody.innerHTML = '';
+            
+            // Sort by Date Ascending
+            const sortedRecords = [...child.records].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+            sortedRecords.forEach(rec => {
+                const ageMonths = moment(rec.date).diff(moment(child.dob), 'months', true);
+                const y = Math.floor(ageMonths/12);
+                const m = Math.floor(ageMonths%12);
+                const ageStr = `${y}歲${m}個月`;
+
+                const pH = rec.height ? calculatePercentile(child.gender, 'height', ageMonths, rec.height)+'%' : '-';
+                const pW = rec.weight ? calculatePercentile(child.gender, 'weight', ageMonths, rec.weight)+'%' : '-';
+                const pHd = rec.head ? calculatePercentile(child.gender, 'head', ageMonths, rec.head)+'%' : '-';
+                const water = rec.weight ? calculateWater(rec.weight) : '-';
+
+                const tr = document.createElement('tr'); tr.className = "hover:bg-gray-50";
+                tr.innerHTML = `<td class="p-4 whitespace-nowrap text-sm">${rec.date}</td><td class="p-4 whitespace-nowrap text-gray-500 text-xs">${ageStr}</td><td class="p-4"><div class="font-bold">${rec.height||'-'}</div><div class="text-xs text-blue-500">${pH}</div></td><td class="p-4"><div class="font-bold">${rec.weight||'-'}</div><div class="text-xs text-green-500">${pW}</div></td><td class="p-4"><div class="font-bold">${rec.head||'-'}</div><div class="text-xs text-purple-500">${pHd}</div></td><td class="p-4 text-blue-400 font-bold">${water}</td><td class="p-4 text-right"><button onclick="deleteRecord('${rec.id}')" class="text-red-300 hover:text-red-500 p-2"><i class="fas fa-trash"></i></button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+        function deleteRecord(recId) { showConfirm('刪除紀錄', '確定要刪除這筆紀錄嗎？', () => { const c = appData.children.find(x => x.id === currentChildId); c.records = c.records.filter(r => r.id !== recId); saveData(); renderHistoryTable(c); updateChart(); }); }
+        
+        function calculatePercentile(gender, type, months, val) { if(val===null || (type==='head'&&months>60)) return '--'; const lms = getLMS(gender, type, months); if(!lms) return '--'; const z = calculateZ(val, lms.L, lms.M, lms.S); return zToPercentile(z); }
+        function getAgeString(dob, target) { const d = moment.duration(moment(target).diff(moment(dob))); return `${d.years()}y ${d.months()}m`; }
+        
+        function switchChartType(type, btn) { currentChartType = type; document.querySelectorAll('.chart-tab-btn').forEach(b => { b.classList.remove('active', 'font-bold', 'text-theme-primary', 'border-b-2', 'border-theme'); b.classList.add('text-gray-500'); }); btn.classList.add('active', 'font-bold', 'text-theme-primary', 'border-b-2', 'border-theme'); btn.classList.remove('text-gray-500'); updateChart(); }
+        
+        function updateChart() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            const child = appData.children.find(c => c.id === currentChildId); if(!child) return;
+            const type = currentChartType; const maxMonths = type === 'head' ? 60 : 216; let chartColor = child.gender==='boy'?'#42A5F5':'#EC407A';
+            const d3=[], d15=[], d50=[], d85=[], d97=[]; const steps = 36;
+            for (let i = 0; i <= maxMonths; i += (maxMonths/steps)) {
+                const lms = getLMS(child.gender, type, i);
+                if (lms) { d3.push({x:i,y:getValFromZ(-1.88,lms.L,lms.M,lms.S)}); d50.push({x:i,y:getValFromZ(0,lms.L,lms.M,lms.S)}); d97.push({x:i,y:getValFromZ(1.88,lms.L,lms.M,lms.S)}); }
+            }
+            const userData = child.records.filter(r => r[type]).map(r => { const m = moment(r.date).diff(moment(child.dob), 'months', true); return (m<0||m>maxMonths)?null:{x:m,y:parseFloat(r[type]),date:r.date}; }).filter(d=>d);
+            chartInstance = new Chart(ctx, { type: 'line', data: { datasets: [{ label: '寶寶紀錄', data: userData, backgroundColor: chartColor, borderColor: chartColor, pointRadius: 6, showLine: false, type: 'scatter' }, { label: '97%', data: d97, borderColor: '#ef9a9a', borderWidth: 1, pointRadius: 0, fill: false, tension: 0.4 }, { label: '50%', data: d50, borderColor: '#81c784', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4 }, { label: '3%', data: d3, borderColor: '#ef9a9a', borderWidth: 1, pointRadius: 0, fill: false, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'linear', max: maxMonths } } } });
+        }
+
+        // Modals
+        function openModal(id) { 
+            const m=document.getElementById(id); m.classList.remove('opacity-0','pointer-events-none'); document.body.classList.add('modal-active'); m.querySelector('.modal-container').classList.remove('scale-95','opacity-0'); 
+            if(id==='addChildModal') {
+                setDateInputs('newChild', moment().format('YYYY-MM-DD'));
+            }
+        }
+        function closeModal(id) { const m=document.getElementById(id); m.classList.add('opacity-0','pointer-events-none'); document.body.classList.remove('modal-active'); m.querySelector('.modal-container').classList.add('scale-95','opacity-0'); }
+        function showConfirm(t,m,cb) { document.getElementById('confirmTitle').innerText=t; document.getElementById('confirmMessage').innerText=m; confirmCallback=cb; openModal('confirmModal'); }
+        document.getElementById('confirmYesBtn').onclick = function() { if(confirmCallback) confirmCallback(); closeModal('confirmModal'); confirmCallback=null; };
+        function showAlert(t,m) { document.getElementById('alertTitle').innerText=t; document.getElementById('alertMessage').innerText=m; openModal('alertModal'); }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
