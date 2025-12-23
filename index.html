@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>下班後的某宅羊 - 寶寶生長紀錄本</title>
+    <title>寶寶生長紀錄 | 下班後的某宅羊</title>
+    <link rel="icon" href="https://duk.tw/X9d3qU.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -170,14 +171,14 @@
     <header class="bg-theme-header p-4 shadow-sm sticky top-0 z-40 transition-colors duration-500">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="showView('listView')">
-                <div class="w-10 h-10 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl transition-colors duration-300">
-                    🐑
-                </div>
+                <img src="https://duk.tw/X9d3qU.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
                 <h1 class="text-xl font-bold text-theme-dark flex items-center gap-2">
-                    <a href="https://www.facebook.com/profile.php?id=61584059466555" target="_blank" class="hover:text-theme-primary transition-colors hover:underline">
-                        下班後的某宅羊
-                    </a>
-                    <span class="text-sm font-normal text-theme-primary hidden sm:inline">| 寶寶生長紀錄</span>
+                    寶寶生長紀錄
+                    <span class="text-sm font-normal text-theme-primary hidden sm:inline">| 
+                        <a href="https://www.facebook.com/profile.php?id=61584059466555" target="_blank" class="hover:text-theme-primary transition-colors hover:underline">
+                            下班後的某宅羊
+                        </a>
+                    </span>
                 </h1>
             </div>
             <div id="headerActions"></div>
@@ -717,7 +718,7 @@
         };
 
         // --- CORE MATH ---
-        function getLMS(gender, type, months) { /* Same as before */
+        function getLMS(gender, type, months) {
             const data = DATA_SOURCES[gender][type];
             if (!data) return null;
             if (months <= data[0][0]) return {L: data[0][1], M: data[0][2], S: data[0][3]};
