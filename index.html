@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寶寶生長紀錄 | 下班後的某宅羊</title>
-    <link rel="icon" href="https://duk.tw/X9d3qU.png">
+    <title>下班後的某宅羊 - 寶寶生長紀錄本</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -171,14 +170,14 @@
     <header class="bg-theme-header p-4 shadow-sm sticky top-0 z-40 transition-colors duration-500">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="showView('listView')">
-                <img src="https://duk.tw/X9d3qU.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                <div class="w-10 h-10 btn-primary rounded-full flex items-center justify-center text-white font-bold text-xl transition-colors duration-300">
+                    🐑
+                </div>
                 <h1 class="text-xl font-bold text-theme-dark flex items-center gap-2">
-                    寶寶生長紀錄
-                    <span class="text-sm font-normal text-theme-primary hidden sm:inline">| 
-                        <a href="https://www.facebook.com/profile.php?id=61584059466555" target="_blank" class="hover:text-theme-primary transition-colors hover:underline">
-                            下班後的某宅羊
-                        </a>
-                    </span>
+                    <a href="https://www.facebook.com/profile.php?id=61584059466555" target="_blank" class="hover:text-theme-primary transition-colors hover:underline">
+                        下班後的某宅羊
+                    </a>
+                    <span class="text-sm font-normal text-theme-primary hidden sm:inline">| 寶寶生長紀錄</span>
                 </h1>
             </div>
             <div id="headerActions"></div>
@@ -542,9 +541,9 @@
         };
 
         const ADVICE_DATA = [
-            { min: 0, max: 0.25, list: ["新生兒睡眠時間長，注意睡姿安全，避免趴睡。", "溢奶是正常的生理現象，喝奶後記得拍嗝，但不強求。", "視力發展初期，黑白圖卡是不錯的刺激工具。"], title: "0-3個月 新生兒適應期" },
+            { min: 0, max: 0.25, list: ["新生兒睡眠時間長，注意睡姿安全，避免趴睡。", "溢奶是正常的生理現象，喝奶後記得拍嗝，但不要強求。", "視力發展初期，黑白圖卡是不錯的刺激工具。"], title: "0-3個月 新生兒適應期" },
             { min: 0.25, max: 0.5, list: ["寶寶開始嘗試翻身囉！注意床邊護欄，避免跌落。", "脖子變硬挺了，可以趴著抬頭看看世界。", "口水變多，喜歡吃手，這是口腔期的探索表現。"], title: "4-6個月 脖頸硬挺期" },
-            { min: 0.5, max: 1, list: ["七坐八爬，家中危險物品要收好，插座加上防護蓋。", "開始長牙可能會歡必霸，給予固齒器舒緩不適。", "副食品多樣化嘗試，建立免疫耐受性，不需延後給予高致敏食物。"], title: "7-12個月 坐爬探索期" },
+            { min: 0.5, max: 1, list: ["七坐八爬，家中危險物品要收好，插座加上防護蓋。", "開始長牙可能會歡必霸，可給予固齒器舒緩不適，多洗手。", "副食品多樣化嘗試，建立免疫耐受性，可以開始增加喝水量。"], title: "7-12個月 坐爬探索期" },
             { min: 1, max: 1.5, list: ["學步期搖搖晃晃，居家防撞措施不能少。", "開始模仿大人說話，多跟寶寶聊天念繪本，並讓寶寶看大人發音時的口型。", "每半年記得帶寶寶去塗氟，保護乳牙健康。"], title: "1-1.5歲 學步期" },
             { min: 1.5, max: 3, list: ["處於『不要不要』的叛逆期，試著給予選擇題代替是非題。", "精力旺盛，多帶去公園放電，有助於晚上睡眠。", "可開始嘗試白天的如廁訓練，但不要給予太大壓力。"], title: "1.5-3歲 幼兒叛逆期" },
             { min: 3, max: 5, list: ["進入幼兒園，初期容易感冒，這是建立免疫系統的過程。", "想像力豐富，喜歡扮演遊戲，陪孩子演戲是很好的互動。", "精細動作進步中，可以玩積木、畫畫訓練小手肌肉。"], title: "3-5歲 學齡前(幼兒園)" },
@@ -553,7 +552,7 @@
             { min: 10, max: 12, gender: 'girl', list: ["女孩青春期較早，胸部發育是第一徵兆，提醒孩子這是正常的。", "生長衝刺期開始，確保充足睡眠與鈣質攝取。", "多運動刺激生長，跳繩是不錯的選擇。"], title: "10-12歲 青春期初期(女)" },
             { min: 10, max: 12, gender: 'boy', list: ["男孩發育較晚，此階段儲備能量，多做負重運動存骨本。", "若睪丸明顯變大，代表青春期悄悄開始囉。", "均衡飲食，避免肥胖影響性早熟。"], title: "10-12歲 儲備期(男)" },
             { min: 12, max: 15, gender: 'girl', list: ["月經初潮通常發生在此階段，身高增加速度會減緩。", "注意鐵質攝取（如紅肉、深綠蔬菜）預防貧血。", "保持自信，接納身體的變化，心理健康很重要。"], title: "12-15歲 青春期成熟(女)" },
-            { min: 12, max: 15, gender: 'boy', list: ["變聲、喉結出現，身高進入飆速期，一年可長10公分以上！", "食量大增，需補充足夠蛋白質與鈣質，避免吃垃圾食物。", "運動量大，注意運動傷害防護。"], title: "12-15歲 青春期衝刺(男)" },
+            { min: 12, max: 15, gender: 'boy', list: ["變聲、喉結出現，身高進入飆速期，可以每個月量身高！", "食量大增，需補充足夠蛋白質與鈣質，避免吃垃圾食物。", "運動量大，注意運動傷害防護。"], title: "12-15歲 青春期衝刺(男)" },
             { min: 15, max: 18, gender: 'girl', list: ["生長板逐漸閉合，身高趨於定型，維持良好體態。", "規律運動不僅維持身材，也能釋放課業壓力。", "建立正確的身體意象，不盲目追求過瘦。"], title: "15-18歲 青少年(女)" },
             { min: 15, max: 18, gender: 'boy', list: ["生長速度減緩，但肌肉量持續增加，體型變壯。", "部分男孩到高中畢業前仍有長高空間，作息要正常。", "培養一種喜愛的運動習慣，受用終身。"], title: "15-18歲 青少年(男)" }
         ];
@@ -650,7 +649,7 @@
                 { title: "帽子戲法", tags: ["反應","觀察"] }, { title: "乾杯", tags: ["記憶","心機"] }, { title: "飛躍魔盜團", tags: ["合作","即時"] },
                 { title: "神奈川學苑", tags: ["收集","美感"] }, { title: "夢想家園", tags: ["規劃","家庭"] }, { title: "星球防衛者", tags: ["策略","規劃"] },
                 { title: "巫術學院", tags: ["連鎖","收集"] }, { title: "卡卡頌", tags: ["策略","板塊放置"] }, { title: "拉密", tags: ["邏輯","數字"] },
-                { title: "矮人礦坑", tags: ["陣營","心機"] }, { title: "璀璨寶石", tags: ["資源管理","策略"] }, { title: "票務大師", tags: ["規劃","策略"] },
+                { title: "矮人礦坑", tags: ["陣營","心機"] }, { title: "璀璨寶石", tags: ["資源管理","策略"] }, { title: "恐龍扛浪", tags: ["卡片","心機"] },
                 { title: "犯人在跳舞", tags: ["推裡","派對"] }, { title: "產地直送", tags: ["經營"] }, { title: "駱駝大賽", tags: ["運氣","博奕"] },
                 { title: "鐵道任務", tags: ["規劃"] }, { title: "爆炸貓", tags: ["派對","運氣"] }, { title: "花磚物語", tags: ["美感","策略"] },
                 { title: "七大奇蹟", tags: ["文明","輪抽"] }, { title: "情書", tags: ["推理","運氣"] }, { title: "富饒之城", tags: ["角色能力","建設"] },
@@ -658,16 +657,16 @@
                 { title: "小世界", tags: ["區域控制"] }, { title: "卡坦島", tags: ["交易","建設"] }, { title: "瘟疫危機", tags: ["合作"] }
             ]},
             { ageMin: 12, ageMax: 18, list: [
-                { title: "古代 (Antiquity)", tags: ["重度策略","經營"] }, { title: "Gloomhaven", tags: ["冒險","合作"] }, { title: "魔戒LCG", tags: ["卡牌","合作"] },
-                { title: "冰與火之歌戰棋", tags: ["對戰","模型"] }, { title: "Android Netrunner", tags: ["對戰","陣營"] }, { title: "Wishland", tags: ["策略","建設"] },
+                { title: "古代 (Antiquity)", tags: ["重度策略","經營"] }, { title: "幽港迷城", tags: ["冒險","合作"] }, { title: "方舟動物園", tags: ["策略","板塊"] },
+                { title: "冰與火之歌戰棋", tags: ["對戰","模型"] }, { title: "迷宮美食家", tags: ["動漫","卡片"] }, { title: "坦帕妮主題樂園", tags: ["策略","建設"] },
                 { title: "三國得志", tags: ["三人","策略"] }, { title: "貓島奇緣", tags: ["板塊","策略"] }, { title: "熊熊公園", tags: ["板塊","拼放"] },
                 { title: "平衡獸", tags: ["平衡","科技"] }, { title: "波多黎各", tags: ["策略","經營"] }, { title: "風聲", tags: ["陣營","心機"] },
-                { title: "狼人殺", tags: ["陣營","口才"] }, { title: "卡坦島", tags: ["策略","交易"] }, { title: "瘟疫危機", tags: ["合作","策略"] },
-                { title: "說書人", tags: ["聯想"] }, { title: "妙語說書人", tags: ["聯想"] }, { title: "截碼戰", tags: ["團隊","推理"] },
+                { title: "炸彈剋星", tags: ["合作","策略"] }, { title: "卡坦島", tags: ["策略","交易"] }, { title: "瘟疫危機", tags: ["合作","策略"] },
+                { title: "火線任務", tags: ["合作","主題"] }, { title: "妙語說書人", tags: ["派對","聯想"] }, { title: "截碼戰", tags: ["團隊","推理"] },
                 { title: "蓋亞計劃", tags: ["重度策略"] }, { title: "鐮刀戰爭", tags: ["區域控制"] }, { title: "電力公司", tags: ["競標","經營"] },
                 { title: "農家樂", tags: ["工人放置"] }, { title: "神秘大地", tags: ["區域控制"] }, { title: "血契獵殺", tags: ["陣營","推理"] },
                 { title: "機密代號", tags: ["聯想","派對"] }, { title: "阿瓦隆", tags: ["陣營","邏輯"] }, { title: "山中小屋", tags: ["劇本","冒險"] },
-                { title: "大西部之路", tags: ["策略"] }, { title: "火星雅利", tags: ["策略"] }, { title: "殖民火星", tags: ["引擎構築"] }
+                { title: "大西部之路", tags: ["策略"] }, { title: "金曲猜歌王", tags: ["派對","記憶"] }, { title: "殖民火星", tags: ["引擎構築"] }
             ]}
         ];
 
@@ -718,7 +717,7 @@
         };
 
         // --- CORE MATH ---
-        function getLMS(gender, type, months) {
+        function getLMS(gender, type, months) { /* Same as before */
             const data = DATA_SOURCES[gender][type];
             if (!data) return null;
             if (months <= data[0][0]) return {L: data[0][1], M: data[0][2], S: data[0][3]};
