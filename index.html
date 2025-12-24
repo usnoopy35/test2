@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寶寶生長紀錄 | 下班後的某宅羊</title>
+    <title>兒童生長紀錄 | 下班後的某宅羊</title>
     <link rel="icon" href="https://duk.tw/X9d3qU.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -173,7 +173,7 @@
             <div class="flex items-center gap-3 cursor-pointer" onclick="showView('listView')">
                 <img src="https://duk.tw/X9d3qU.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
                 <h1 class="text-xl font-bold text-theme-dark flex items-center gap-2">
-                    寶寶生長紀錄
+                    兒童生長紀錄
                     <span class="text-sm font-normal text-theme-primary hidden sm:inline">| 
                         <a href="https://www.facebook.com/profile.php?id=61584059466555" target="_blank" class="hover:text-theme-primary transition-colors hover:underline">
                             下班後的某宅羊
@@ -191,7 +191,7 @@
         <section id="listView" class="space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-end mb-4 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-theme-dark">寶貝列表</h2>
+                    <h2 class="text-2xl font-bold text-theme-dark">小朋友列表</h2>
                     <p class="text-sm text-gray-500">選擇一位小朋友查看生長紀錄</p>
                 </div>
                 <div class="flex gap-2">
@@ -205,7 +205,7 @@
                     </button>
                     
                     <button onclick="openModal('addChildModal')" class="btn-primary px-4 py-2 rounded-lg shadow-sm flex items-center gap-2">
-                        <i class="fas fa-plus"></i> 新增寶寶
+                        <i class="fas fa-plus"></i> 新增小朋友
                     </button>
                 </div>
             </div>
@@ -216,7 +216,7 @@
 
             <div id="emptyState" class="hidden text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
                 <div class="text-4xl mb-3">👶</div>
-                <p class="text-gray-500">還沒有建立寶寶資料喔！</p>
+                <p class="text-gray-500">還沒有建立小朋友資料喔！</p>
                 <button onclick="openModal('addChildModal')" class="mt-4 text-theme-primary font-bold hover:underline">馬上建立</button>
             </div>
         </section>
@@ -465,12 +465,12 @@
         <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-lg shadow-lg z-50 overflow-y-auto transform transition-all scale-95 opacity-0">
             <div class="modal-content py-4 text-left px-6">
                 <div class="flex justify-between items-center pb-3 border-b mb-3">
-                    <p class="text-2xl font-bold text-theme-dark">新增一位寶貝</p>
+                    <p class="text-2xl font-bold text-theme-dark">新增一位小朋友</p>
                     <div class="modal-close cursor-pointer z-50" onclick="closeModal('addChildModal')"><i class="fas fa-times"></i></div>
                 </div>
                 <form id="addChildForm" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-bold mb-1">寶貝暱稱</label>
+                        <label class="block text-sm font-bold mb-1">小朋友暱稱</label>
                         <input type="text" id="newChildName" placeholder="例如: 小湯圓" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-current text-theme-primary">
                     </div>
                     <div>
@@ -532,12 +532,12 @@
     </div>
 
     <script>
-        // ... (CONSTANTS same as before) ...
+        // ... (CONSTANTS) ...
         const DATA_SOURCES = {
             boy: {
                 height: [[0,1,49.884,0.03795],[6,1,67.62,0.03265],[12,1,75.75,0.03215],[24,1,87.8,0.0323],[36,1,96.1,0.0329],[48,1,103.3,0.0336],[60,1,110.0,0.0343],[84,1,122.5,0.045],[120,1,140.5,0.05],[144,1,155.0,0.055],[168,1,168.0,0.045],[216,1,172.5,0.04]],
                 weight: [[0,0.3487,3.346,0.146],[6,0.0768,7.9,0.11],[12,0.015,9.6,0.108],[24,-0.05,12.2,0.11],[36,-0.09,14.3,0.115],[48,-0.11,16.3,0.12],[60,-0.12,18.3,0.125],[84,-0.15,23.5,0.14],[120,-0.2,35.0,0.16],[144,-0.2,48.0,0.18],[168,-0.1,60.0,0.15],[216,-0.05,65.0,0.14]],
-                head: [[0,1,34.5,0.037],[6,1,43.3,0.03],[12,1,46.1,0.028],[24,1,48.2,0.027],[36,1,49.5,0.027],[48,1,50.2,0.027],[60,1,50.7,0.027]]
+                head: [[0,1,34.5,0.037],[6,1,43.3,0.03],[12,1,46.1,0.028],[24,1,48.2,0.027],[36,1,49.5,0.027],[48,1,50.2,0.027],[60,1,49.7,0.027]]
             },
             girl: {
                 height: [[0,1,49.1,0.0379],[6,1,65.7,0.033],[12,1,74.0,0.033],[24,1,86.4,0.033],[36,1,95.1,0.034],[48,1,102.7,0.035],[60,1,109.4,0.036],[84,1,121.0,0.045],[120,1,141.0,0.05],[144,1,153.0,0.05],[168,1,159.0,0.045],[216,1,160.0,0.04]],
@@ -548,9 +548,9 @@
 
         const ADVICE_DATA = [
             { min: 0, max: 0.25, list: ["新生兒睡眠時間長，注意睡姿安全，避免趴睡。", "溢奶是正常的生理現象，喝奶後記得拍嗝，但不強求。", "視力發展初期，黑白圖卡是不錯的刺激工具。"], title: "0-3個月 新生兒適應期" },
-            { min: 0.25, max: 0.5, list: ["寶寶開始嘗試翻身囉！注意床邊護欄，避免跌落。", "脖子變硬挺了，可以趴著抬頭看看世界。", "口水變多，喜歡吃手，這是口腔期的探索表現。"], title: "4-6個月 脖頸硬挺期" },
+            { min: 0.25, max: 0.5, list: ["小朋友開始嘗試翻身囉！注意床邊護欄，避免跌落。", "脖子變硬挺了，可以趴著抬頭看看世界。", "口水變多，喜歡吃手，這是口腔期的探索表現。"], title: "4-6個月 脖頸硬挺期" },
             { min: 0.5, max: 1, list: ["七坐八爬，家中危險物品要收好，插座加上防護蓋。", "開始長牙可能會歡必霸，給予固齒器舒緩不適。", "副食品多樣化嘗試，建立免疫耐受性，不需延後給予高致敏食物。"], title: "7-12個月 坐爬探索期" },
-            { min: 1, max: 1.5, list: ["學步期搖搖晃晃，居家防撞措施不能少。", "開始模仿大人說話，多跟寶寶聊天念繪本，並讓寶寶看大人發音時的口型。", "每半年記得帶寶寶去塗氟，保護乳牙健康。"], title: "1-1.5歲 學步期" },
+            { min: 1, max: 1.5, list: ["學步期搖搖晃晃，居家防撞措施不能少。", "開始模仿大人說話，多跟小朋友聊天念繪本，並讓小朋友看大人發音時的口型。", "每半年記得帶小朋友去塗氟，保護乳牙健康。"], title: "1-1.5歲 學步期" },
             { min: 1.5, max: 3, list: ["處於『不要不要』的叛逆期，試著給予選擇題代替是非題。", "精力旺盛，多帶去公園放電，有助於晚上睡眠。", "可開始嘗試白天的如廁訓練，但不要給予太大壓力。"], title: "1.5-3歲 幼兒叛逆期" },
             { min: 3, max: 5, list: ["進入幼兒園，初期容易感冒，這是建立免疫系統的過程。", "想像力豐富，喜歡扮演遊戲，陪孩子演戲是很好的互動。", "精細動作進步中，可以玩積木、畫畫訓練小手肌肉。"], title: "3-5歲 學齡前(幼兒園)" },
             { min: 5, max: 7, list: ["準備進入小學，建立規律作息與早睡早起的習慣。", "開始換牙（第一大臼齒萌發），要幫孩子使用牙線清潔。", "注意視力保健，用眼30分鐘休息10分鐘，多戶外活動。"], title: "5-7歲 學齡前(大班-小一)" },
@@ -621,33 +621,35 @@
             ]}
         ];
 
-        // Refined Games with Tags
+        // Refined Games with Tags (Updated as per user request)
         const GAMES_LIBRARY = [
             { ageMin: 0, ageMax: 2, list: [
                 { title: "疊疊杯", tags: ["手眼協調"] }, { title: "軟積木", tags: ["觸覺"] }, { title: "形狀配對盒", tags: ["認知","精細動作"] },
                 { title: "觸覺球", tags: ["感覺統合"] }, { title: "布書", tags: ["視覺","觸覺"] }, { title: "敲擊樂器", tags: ["聽覺","節奏"] },
                 { title: "滾球塔", tags: ["追視","因果"] }, { title: "推拉玩具", tags: ["大動作"] }, { title: "音樂鈴", tags: ["安撫"] },
                 { title: "六面聲光盒", tags: ["探索"] }, { title: "手抓板拼圖", tags: ["配對"] }, { title: "洗澡書", tags: ["生活"] },
-                { title: "安撫巾", tags: ["安撫"] }, { title: "波波球", tags: ["觸覺"] }, { title: "多功能健力架", tags: ["大動作"] }
+                { title: "安撫巾", tags: ["安撫"] }, { title: "波波球", tags: ["觸覺"] }, { title: "多功能健力架", tags: ["大動作"] },
+                { title: "第一套桌遊-小果園", tags: ["HABA","合作"] }, { title: "晚安小月亮", tags: ["HABA","配對"] }
             ]},
             { ageMin: 2, ageMax: 4, list: [
-                { title: "三隻小豬", tags: ["邏輯","空間"] }, { title: "推推松鼠", tags: ["邏輯","規劃"] }, { title: "彩虹小馬", tags: ["運氣","擲骰"] },
+                { title: "三隻小豬", tags: ["SmartGames","邏輯"] }, { title: "推推松鼠", tags: ["SmartGames","規劃"] }, { title: "彩虹小馬", tags: ["運氣","擲骰"] },
                 { title: "城市小旅行", tags: ["手牌管理","顏色"] }, { title: "動物變裝秀", tags: ["邏輯","配對"] }, { title: "諾亞方舟", tags: ["平衡","手眼協調"] },
-                { title: "拔毛運動會", tags: ["記憶"] }, { title: "釣魚遊戲", tags: ["專注","手眼協調"] }, { title: "樂高得寶", tags: ["建構","創意"] },
+                { title: "拔毛運動會", tags: ["記憶","經典"] }, { title: "釣魚遊戲", tags: ["HABA","手眼協調"] }, { title: "樂高得寶", tags: ["建構","創意"] },
                 { title: "記憶翻牌", tags: ["記憶"] }, { title: "醜娃娃", tags: ["反應","觀察"] }, { title: "哆寶", tags: ["反應","觀察"] },
                 { title: "企鵝破冰", tags: ["手部控制"] }, { title: "平衡仙人掌", tags: ["平衡"] }, { title: "木製切切樂", tags: ["角色扮演"] },
-                { title: "磁力片", tags: ["建構"] }, { title: "黏土工具組", tags: ["創造"] }, { title: "大型地板拼圖", tags: ["空間"] },
-                { title: "穿繩遊戲", tags: ["精細動作"] }, { title: "釣鴨子", tags: ["專注"] }
+                { title: "磁力片", tags: ["建構"] }, { title: "黏土工具組", tags: ["創造"] }, { title: "動物疊疊樂 (Tier auf Tier)", tags: ["HABA","平衡"] },
+                { title: "烏鴉果園", tags: ["HABA","合作"] }, { title: "釣鴨子", tags: ["專注"] }
             ]},
             { ageMin: 4, ageMax: 7, list: [
-                { title: "超級犀牛", tags: ["平衡","手部控制"] }, { title: "磁石魔法迷宮", tags: ["記憶","創意"] }, { title: "獅子剪髮大冒險", tags: ["合作","記憶"] },
+                { title: "超級犀牛", tags: ["HABA","平衡"] }, { title: "磁石魔法迷宮", tags: ["記憶","創意"] }, { title: "獅子剪髮大冒險", tags: ["合作","記憶"] },
                 { title: "狐狸在哪裡", tags: ["合作","推理"] }, { title: "石器時代兒童版", tags: ["記憶","資源"] }, { title: "閃靈快手", tags: ["反應","邏輯"] },
-                { title: "睡皇后", tags: ["運氣","簡單策略"] }, { title: "序列喵喵", tags: ["策略","觀察"] }, { title: "妙語說書人", tags: ["表達","想像"] },
+                { title: "睡皇后", tags: ["運氣","簡單策略"] }, { title: "卡卡頌(兒童版)", tags: ["策略","觀察"] }, { title: "妙語說書人", tags: ["表達","想像"] },
                 { title: "德國心臟病", tags: ["反應","加法"] }, { title: "傳情畫意", tags: ["畫畫","表達"] }, { title: "髒小豬", tags: ["策略","運氣"] },
-                { title: "誰是牛頭王", tags: ["數字","邏輯"] }, { title: "冰酷企鵝", tags: ["技巧"] }, { title: "小白世紀", tags: ["冒險"] },
-                { title: "百變方塊", tags: ["立體","邏輯"] }, { title: "伐木達人", tags: ["手部控制"] }, { title: "快手疊杯", tags: ["反應","競速"] },
-                { title: "推倒提基", tags: ["策略"] }, { title: "小羊躲貓貓", tags: ["記憶"] }, { title: "雞同鴨搶", tags: ["策略"] },
-                { title: "龍之吐息", tags: ["觀察","收集"] }, { title: "萌犬對對碰", tags: ["觀察","反應"] }, { title: "披薩大亨", tags: ["數學","速度"] }
+                { title: "誰是牛頭王", tags: ["數字","邏輯"] }, { title: "冰酷企鵝", tags: ["技巧","彈指"] }, { title: "小白世紀", tags: ["冒險"] },
+                { title: "跳跳猴大作戰", tags: ["手部控制"] }, { title: "伐木達人", tags: ["手部控制"] }, { title: "快手疊杯", tags: ["反應","競速"] },
+                { title: "推倒提基", tags: ["策略","心機"] }, { title: "小羊躲貓貓", tags: ["HABA","記憶"] }, { title: "雞同鴨搶", tags: ["策略"] },
+                { title: "龍之吐息", tags: ["HABA","收集"] }, { title: "萌犬對對碰", tags: ["觀察","反應"] }, { title: "披薩大亨", tags: ["數學","速度"] },
+                { title: "百變方塊", tags: ["益智","空間"] }
             ]},
             { ageMin: 7, ageMax: 12, list: [
                 { title: "多米諾王國", tags: ["策略","板塊"] }, { title: "蟲蟲燒烤派對", tags: ["運氣","數學"] }, { title: "牙買加", tags: ["競速","運氣"] },
@@ -656,23 +658,26 @@
                 { title: "神奈川學苑", tags: ["收集","美感"] }, { title: "夢想家園", tags: ["規劃","家庭"] }, { title: "星球防衛者", tags: ["策略","規劃"] },
                 { title: "巫術學院", tags: ["連鎖","收集"] }, { title: "卡卡頌", tags: ["策略","板塊放置"] }, { title: "拉密", tags: ["邏輯","數字"] },
                 { title: "矮人礦坑", tags: ["陣營","心機"] }, { title: "璀璨寶石", tags: ["資源管理","策略"] }, { title: "票務大師", tags: ["規劃","策略"] },
-                { title: "犯人在跳舞", tags: ["推裡","派對"] }, { title: "步步為營", tags: ["棋類","策略"] }, { title: "駱駝大賽", tags: ["運氣","博奕"] },
+                { title: "犯人在跳舞", tags: ["推裡","派對"] }, { title: "產地直送", tags: ["經營"] }, { title: "駱駝大賽", tags: ["運氣","博奕"] },
                 { title: "鐵道任務", tags: ["規劃"] }, { title: "爆炸貓", tags: ["派對","運氣"] }, { title: "花磚物語", tags: ["美感","策略"] },
                 { title: "七大奇蹟", tags: ["文明","輪抽"] }, { title: "情書", tags: ["推理","運氣"] }, { title: "富饒之城", tags: ["角色能力","建設"] },
                 { title: "印加寶藏", tags: ["風險評估"] }, { title: "皇輿爭霸", tags: ["牌庫構築"] }, { title: "石器時代", tags: ["工人放置"] },
-                { title: "小世界", tags: ["區域控制"] }, { title: "卡坦島", tags: ["交易","建設"] }, { title: "瘟疫危機", tags: ["合作"] }
+                { title: "小世界", tags: ["區域控制"] }, { title: "卡坦島", tags: ["交易","建設"] }, { title: "瘟疫危機", tags: ["合作"] },
+                { title: "步步為營", tags: ["策略","圍堵"] }, { title: "黑白棋", tags: ["經典","策略"] }, { title: "序列喵喵", tags: ["運氣","策略"] }
             ]},
             { ageMin: 12, ageMax: 18, list: [
-                { title: "限時解鎖密室逃脫", tags: ["主題","合作"] }, { title: "幽港迷城", tags: ["冒險","合作"] }, { title: "方舟動物園", tags: ["策略","板塊"] },
-                { title: "勃根地城堡", tags: ["策略","骰子"] }, { title: "迷宮美食家", tags: ["動漫","卡片"] }, { title: "坦帕妮主題樂園", tags: ["策略","建設"] },
                 { title: "三國得志", tags: ["三人","策略"] }, { title: "貓島奇緣", tags: ["板塊","策略"] }, { title: "熊熊公園", tags: ["板塊","拼放"] },
-                { title: "平衡獸", tags: ["平衡","科技"] }, { title: "波多黎各", tags: ["策略","經營"] }, { title: "龍翼翱翔", tags: ["建設","策略"] },
-                { title: "炸彈剋星", tags: ["合作","策略"] }, { title: "卡坦島", tags: ["策略","交易"] }, { title: "瘟疫危機", tags: ["合作","策略"] },
-                { title: "火線任務", tags: ["合作","主題"] }, { title: "妙語說書人", tags: ["派對","聯想"] }, { title: "截碼戰", tags: ["團隊","推理"] },
+                { title: "平衡獸", tags: ["平衡","科技"] }, { title: "波多黎各", tags: ["策略","經營"] },
+                { title: "卡坦島", tags: ["策略","交易"] }, { title: "瘟疫危機", tags: ["合作","策略"] },
+                { title: "妙語說書人", tags: ["聯想"] }, { title: "截碼戰", tags: ["團隊","推理"] },
                 { title: "蓋亞計劃", tags: ["重度策略"] }, { title: "鐮刀戰爭", tags: ["區域控制"] }, { title: "電力公司", tags: ["競標","經營"] },
-                { title: "農家樂", tags: ["工人放置"] }, { title: "神秘大地", tags: ["區域控制"] }, { title: "世界奇觀", tags: ["板塊","模型"] },
-                { title: "機密代號", tags: ["聯想","派對"] }, { title: "魔物討伐隊", tags: ["角色扮演","對戰"] }, { title: "山中小屋", tags: ["劇本","冒險"] },
-                { title: "大西部之路", tags: ["策略"] }, { title: "金曲猜歌王", tags: ["派對","記憶"] }, { title: "殖民火星", tags: ["引擎構築"] }
+                { title: "農家樂", tags: ["工人放置"] }, { title: "神秘大地", tags: ["區域控制"] },
+                { title: "機密代號", tags: ["聯想","派對"] }, { title: "阿瓦隆", tags: ["陣營","邏輯"] }, { title: "山中小屋", tags: ["劇本","冒險"] },
+                { title: "大西部之路", tags: ["策略"] }, { title: "殖民火星", tags: ["引擎構築"] },
+                { title: "火線任務", tags: ["合作","救援"] }, { title: "炸彈剋星", tags: ["合作","推理"] }, { title: "勃根地城堡", tags: ["策略","骰子"] },
+                { title: "方舟動物園", tags: ["策略","經營"] }, { title: "限時解鎖", tags: ["解謎","合作"] }, { title: "世界奇觀", tags: ["板塊","建設"] },
+                { title: "龍翼翱翔", tags: ["策略","收集"] }, { title: "魔物討伐隊", tags: ["合作","戰鬥"] }, { title: "遊惡園", tags: ["談判","策略"] },
+                { title: "哥吉拉東京衝突", tags: ["對戰","破壞"] }, { title: "幽港迷城", tags: ["冒險","戰役"] }
             ]}
         ];
 
@@ -703,23 +708,8 @@
 
         // Teeth Data (Symmetric layout)
         const TEETH_LAYOUT = {
-            primary: [
-                { type: 'incisor', angle: 10, erupt: [6,12], shed: [72,84] },
-                { type: 'incisor', angle: 25, erupt: [9,16], shed: [84,96] },
-                { type: 'canine',  angle: 45, erupt: [16,23], shed: [108,144] },
-                { type: 'molar',   angle: 65, erupt: [13,19], shed: [108,132] },
-                { type: 'molar',   angle: 85, erupt: [23,33], shed: [120,144] }
-            ],
-            permanent: [
-                { type: 'incisor', angle: 8, erupt: [72,96] },
-                { type: 'incisor', angle: 20, erupt: [84,108] },
-                { type: 'canine',  angle: 35, erupt: [108,144] },
-                { type: 'molar',   angle: 50, erupt: [120,144] },
-                { type: 'molar',   angle: 65, erupt: [120,144] },
-                { type: 'molar',   angle: 80, erupt: [72,84] },
-                { type: 'molar',   angle: 95, erupt: [132,156] },
-                { type: 'molar',   angle: 110, erupt: [204,252] }
-            ]
+            primary: [ { type: 'incisor', angle: 10, erupt: [6,12], shed: [72,84] }, { type: 'incisor', angle: 25, erupt: [9,16], shed: [84,96] }, { type: 'canine', angle: 45, erupt: [16,23], shed: [108,144] }, { type: 'molar', angle: 65, erupt: [13,19], shed: [108,132] }, { type: 'molar', angle: 85, erupt: [23,33], shed: [120,144] } ],
+            permanent: [ { type: 'incisor', angle: 8, erupt: [72,96] }, { type: 'incisor', angle: 20, erupt: [84,108] }, { type: 'canine', angle: 35, erupt: [108,144] }, { type: 'molar', angle: 50, erupt: [120,144] }, { type: 'molar', angle: 65, erupt: [120,144] }, { type: 'molar', angle: 80, erupt: [72,84] }, { type: 'molar', angle: 95, erupt: [132,156] }, { type: 'molar', angle: 110, erupt: [204,252] } ]
         };
 
         // --- CORE MATH ---
@@ -755,6 +745,7 @@
         let confirmCallback = null;
         let currentView = 'listView';
         let currentTab = 'record';
+        let dateModes = { rec: 'roc', newChild: 'roc' };
 
         function loadData() {
             const saved = localStorage.getItem('sheepGrowthApp');
@@ -778,21 +769,14 @@
 
         // --- HELPER: GET EVALUATED AGE (Corrected Age Logic) ---
         function getEvaluatedAge(child, targetDate) {
-            // Chronological age in months
             const chronoMonths = moment(targetDate).diff(moment(child.dob), 'months', true);
-            
-            // Default: no correction
             let evalMonths = chronoMonths;
             let isCorrected = false;
             let label = "";
 
-            // Check if premature (< 37 weeks)
-            // Correction applies typically up to 24-36 months.
-            // Formula: Correction = (40 - weeks) / 4.345 (months)
             const weeks = child.weeks || 40;
-            
-            if (weeks < 37 && chronoMonths <= 36) { // Apply up to 3 years
-                const correctionMonths = (40 - weeks) * 7 / 30.4375; // More precise
+            if (weeks < 37 && chronoMonths <= 36) { 
+                const correctionMonths = (40 - weeks) * 7 / 30.4375; 
                 const corrected = chronoMonths - correctionMonths;
                 if (corrected > 0) {
                     evalMonths = corrected;
@@ -800,7 +784,6 @@
                 }
             }
 
-            // Format label
             const y = Math.floor(evalMonths/12);
             const m = Math.floor(evalMonths%12);
             label = `${y}歲${m}個月`;
@@ -1046,6 +1029,7 @@
                 container.appendChild(label);
                 
                 const centerX = 150; 
+                // Identical Anchor and Radii for Symmetry
                 const anchorY = pos === 'upper' ? 140 : 20; 
                 const rPermX = 100; const rPermY = 90;
                 const rPrimaryX = 70; const rPrimaryY = 60;
@@ -1133,8 +1117,7 @@
         function refreshRecommendations() {
              const child = appData.children.find(c => c.id === currentChildId);
              if(!child) return;
-             const ageInfo = getEvaluatedAge(child, moment());
-             renderRecommendations(ageInfo.months / 12);
+             renderRecommendations(moment().diff(moment(child.dob), 'years', true));
         }
 
         function switchDetailTab(tabName) {
